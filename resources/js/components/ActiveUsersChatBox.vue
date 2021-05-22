@@ -9,19 +9,51 @@
         <h6>Let's Chat - Online</h6>
       </div>
       <div class="text-center p-2">
+        <strong style="color: black">Joined Groups!</strong>
+      </div>
+      <div>
+        <ul class="chat-users-list" style="height: auto; overflow-y: scroll">
+          <li v-for="(group, index) in groups" :key="index">
+            <a
+              href="#chat"
+              @click="newChat(`group-${group.name}`, undefined, group.id)"
+              >{{ group.name }}</a
+            >
+          </li>
+        </ul>
+      </div>
+      <div class="text-center p-2">
         <strong style="color: black">Currently Active Users!</strong>
       </div>
-      <div class="chat-form"></div>
       <div>
         <ul class="chat-users-list" style="height: 300px; overflow-y: scroll">
           <li v-for="(user, index) in users" :key="index">
-            <a href="#chat" @click="newChat(user.id, user.name, authuserid)">{{
+            <a href="#chat" @click="newChat(user.name, user.id)">{{
               user.name
             }}</a>
           </li>
         </ul>
       </div>
     </div>
+
+    <!-- <div style="z-index=10;margin-bottom:15px;cursor:pointer">
+      <div
+        class="activeUsersBtn"
+        style="
+          height: 50px;
+          width: 55px;
+          background-color: white;
+          margin-right: 100px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          box-shadow: 0px 7px 30px silver;
+        "
+        @click="toggleChatWrapper"
+      >
+        <i class="far fa-edit" style="font-size: 20px; margin-left: 17px"></i>
+      </div>
+    </div> -->
   </div>
 </template>
 
@@ -29,7 +61,7 @@
 import NewChatBox from "./NewChatBoxComponent.vue";
 
 export default {
-  props: ["authuserid", "divID"],
+  props: ["authuser", "divID", "usergroups"],
   components: {
     NewChatBox,
   },
@@ -43,9 +75,26 @@ export default {
       //run the newChat function that is responsable for openeing the chat windows, so by doing this whenever i refresh
       //the page if there was any opened chat it will be automatically opened.
       this.usersOpenedChatArray.forEach((el) => {
-        this.newChat(el.id, el.name);
+        this.newChat(el.name, el.id, el.groupid);
       });
     }
+
+    console.log(this.usergroups);
+    this.groups = this.usergroups;
+    this.groups.forEach((group) => {
+      window.Echo.private(`group.${group.id}`).listen(
+        "MessageSentEvent",
+        (event) => {
+          console.log(event);
+          this.messages.push(event.message);
+          this.newChat(
+            `group-${group.name}`,
+            undefined,
+            event.message.group_id
+          );
+        }
+      );
+    });
   },
   data() {
     return {
@@ -57,12 +106,15 @@ export default {
       opacityClass: false,
       alreadyExistedDiv: null,
       usersOpenedChatArray: [],
+      groups: [],
+      chatContainerToggledRight: false,
     };
   },
   created() {
     //if there is no session created then create one and put the usersOpenedChatArray in it,
     //because we are gonna use it to automatically open the previously opened chat windows.
 
+    console.log(this.authuser.id);
     if (!sessionStorage.getItem("usersOpenedChat")) {
       sessionStorage.setItem(
         "usersOpenedChat",
@@ -75,25 +127,30 @@ export default {
       //then listen to the new message event then run the newChat function.
       .here((user) => {
         user.forEach((user) => {
-          if (user.id !== this.authuserid) {
+          console.log(user.id, this.authuser.id);
+          if (user.id !== this.authuser.id) {
             this.users.push(user);
             window.Echo.private(
-              `messages.${user.id}.${this.authuserid}`
-            ).listen("MessageSentEvent", (event) =>
-              this.newChat(user.id, user.name)
-            );
+              `messages.${user.id}.${this.authuser.id}`
+            ).listen("MessageSentEvent", (event) => {
+              console.log("hehehehe advancedchat");
+              this.newChat(user.name, user.id);
+            });
           }
         });
       })
       .joining((user) => {
+        console.log("joined");
         //if a user was newly logged in then join the unique private channel, and listen to the new message event,
         //then run the newChat function.
-        this.users.push(user);
-        window.Echo.private(
-          `messages.${user.id}.${this.authuserid}`
-        ).listen("MessageSentEvent", (event) =>
-          this.newChat(user.id, user.name)
+        window.Echo.private(`messages.${user.id}.${this.authuser.id}`).listen(
+          "MessageSentEvent",
+          (event) => {
+            console.log("hehehehe advancedchat");
+            this.newChat(user.name, user.id);
+          }
         );
+        this.users.push(user);
       })
       .leaving((user) => {
         //when a user logged out or left the web site then filter the users array,
@@ -102,21 +159,47 @@ export default {
           return user.id != u.id;
         });
       });
+
+    window.Echo.private(`user.${this.authuser.id}`).listen(
+      "GroupCreatedEvent",
+      (event) => {
+        console.log("group created");
+        this.groups.push(event.group);
+      }
+    );
   },
 
   methods: {
     toggleOpacity() {
       this.opacityClass = !this.opacityClass;
     },
-    newChat(id, name) {
+
+    toggleChatWrapper() {
+      const chatWrapper = document.querySelector(".chat-wrapper");
+      const activeUsersBtn = document.querySelector(".activeUsersBtn");
+      const chatContainer = document.querySelector(".chat-container");
+      if (this.chatContainerToggledRight) {
+        this.chatContainerToggledRight = false;
+        chatContainer.style.paddingRight = "190px";
+      } else {
+        this.chatContainerToggledRight = true;
+        chatContainer.style.paddingRight = "80px";
+      }
+      activeUsersBtn.classList.toggle("toggleActiveUsersBtnRight");
+      chatWrapper.classList.toggle("toggleDisplay");
+    },
+
+    newChat(name, id, groupid) {
       this.usersOpenedChatArray = JSON.parse(
         sessionStorage.getItem("usersOpenedChat")
       );
 
       //if window chat is opened with this user then do not put a new object in the usersOpenedChatArray,
       //this is why i am checking the usersOpenedChatArray.
-      if (!this.usersOpenedChatArray.find((userChat) => userChat.id == id)) {
-        let userChat = { id, name };
+      if (
+        !this.usersOpenedChatArray.find((userChat) => userChat.name == name)
+      ) {
+        let userChat = { id, name, groupid };
         this.usersOpenedChatArray.push(userChat);
         sessionStorage.setItem(
           `usersOpenedChat`,
@@ -127,9 +210,9 @@ export default {
         ".componentContainer"
       );
 
-      const alreadyExistedDiv = document.getElementById(
-        `componentContainer${id}`
-      );
+      const alreadyExistedDiv = id
+        ? document.getElementById(`componentContainer${id}`)
+        : document.getElementById(`componentContainer${name}`);
 
       //if there is a chat window existed with this user id then return false.
       if (alreadyExistedDiv) return false;
@@ -145,17 +228,28 @@ export default {
 
       const chatContainer = document.querySelector(".chat-container");
       const componentContainer = document.createElement("div");
+      let componentConntainerId;
       componentContainer.classList.add("componentContainer", "chatBox");
-      componentContainer.setAttribute("id", `componentContainer${id}`);
+      if (id !== undefined) {
+        componentConntainerId = `componentContainer${id}`;
+        componentContainer.setAttribute("id", componentConntainerId);
+      } else {
+        componentConntainerId = `componentContainer${name}`;
+        componentContainer.setAttribute("id", componentConntainerId);
+      }
 
       let vuecomp = Vue.extend(NewChatBox);
       let comp = new vuecomp({
         propsData: {
-          fromUserID: this.authuserid,
+          fromUserID: this.authuser.id,
           toUserID: id,
-          panelFooter: `panel-footer-${id}`,
+          panelFooter:
+            id !== undefined ? `panel-footer-${id}` : `panel-footer-${name}`,
           userName: name,
           usersOpenedChatArray: this.usersOpenedChatArray,
+          componentID: componentConntainerId,
+          groupID: groupid,
+          authuser: this.authuser,
         },
       }).$mount(componentContainer);
       componentContainer.append(comp.$el);
@@ -193,6 +287,15 @@ body {
 
 .toggleOpacityClass {
   opacity: 1 !important;
+}
+
+.toggleDisplay {
+  display: none;
+}
+
+.toggleActiveUsersBtnRight {
+  position: fixed;
+  bottom: 15px;
 }
 
 .chat-btn {

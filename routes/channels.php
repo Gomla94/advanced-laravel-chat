@@ -1,5 +1,6 @@
 <?php
 
+use App\Group;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -23,4 +24,13 @@ Broadcast::channel('joinChat-channel', function ($user) {
 
 Broadcast::channel('messages.{from}.{to}', function ($user, $from, $to) {
     return true;
+});
+
+Broadcast::channel('user.{id}', function ($user, $id) {
+    return (int) $user->id === (int) $id;
+});
+
+Broadcast::channel('group.{id}', function ($user, $group) {
+    $chatGroup = Group::find($group);
+    return $chatGroup->users->contains($user->id);
 });

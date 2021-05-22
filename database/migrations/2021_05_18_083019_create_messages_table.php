@@ -17,9 +17,10 @@ class CreateMessagesTable extends Migration
             $table->id();
             $table->string('message')->nullable();
             $table->integer('from');
-            $table->integer('to');
+            $table->integer('to')->nullable();
             $table->text('file')->nullable();
             $table->string('type')->nullable();
+            $table->integer('group_id')->nullable();
             $table->string('created_at');
         });
     }

@@ -16,6 +16,8 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
+
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -77,11 +79,22 @@
 
         <main class="py-4">
             @if (auth()->check())
-                <div class="chat-container" style="">
-                    <activeusers-chatbox :user="{{auth()->user()}}" :authuserid="{{auth()->user()->id}}"></activeusers-chatbox>
+                <div class="chat-container" >
+                    <activeusers-chatbox :authuser="{{auth()->user()}}" :userGroups="{{auth()->user()->groups}}"></activeusers-chatbox>
                 </div>
             @endif
-            @yield('content')
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-2">
+                       
+                    </div>
+                    <div class="col-md-8">
+                        @yield('content')
+                    </div>
+                </div>
+            </div>
+            
+            
         </main>
     </div>
 </body>

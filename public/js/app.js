@@ -1948,9 +1948,41 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ["authuserid", "divID"],
+  props: ["authuser", "divID", "usergroups"],
   components: {
     NewChatBox: _NewChatBoxComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
@@ -1963,9 +1995,21 @@ __webpack_require__.r(__webpack_exports__);
       //the page if there was any opened chat it will be automatically opened.
 
       this.usersOpenedChatArray.forEach(function (el) {
-        _this.newChat(el.id, el.name);
+        _this.newChat(el.name, el.id, el.groupid);
       });
     }
+
+    console.log(this.usergroups);
+    this.groups = this.usergroups;
+    this.groups.forEach(function (group) {
+      window.Echo["private"]("group.".concat(group.id)).listen("MessageSentEvent", function (event) {
+        console.log(event);
+
+        _this.messages.push(event.message);
+
+        _this.newChat("group-".concat(group.name), undefined, event.message.group_id);
+      });
+    });
   },
   data: function data() {
     return {
@@ -1976,7 +2020,9 @@ __webpack_require__.r(__webpack_exports__);
       typingTimer: false,
       opacityClass: false,
       alreadyExistedDiv: null,
-      usersOpenedChatArray: []
+      usersOpenedChatArray: [],
+      groups: [],
+      chatContainerToggledRight: false
     };
   },
   created: function created() {
@@ -1984,6 +2030,8 @@ __webpack_require__.r(__webpack_exports__);
 
     //if there is no session created then create one and put the usersOpenedChatArray in it,
     //because we are gonna use it to automatically open the previously opened chat windows.
+    console.log(this.authuser.id);
+
     if (!sessionStorage.getItem("usersOpenedChat")) {
       sessionStorage.setItem("usersOpenedChat", JSON.stringify(this.usersOpenedChatArray));
     }
@@ -1993,22 +2041,29 @@ __webpack_require__.r(__webpack_exports__);
     //then listen to the new message event then run the newChat function.
     .here(function (user) {
       user.forEach(function (user) {
-        if (user.id !== _this2.authuserid) {
+        console.log(user.id, _this2.authuser.id);
+
+        if (user.id !== _this2.authuser.id) {
           _this2.users.push(user);
 
-          window.Echo["private"]("messages.".concat(user.id, ".").concat(_this2.authuserid)).listen("MessageSentEvent", function (event) {
-            return _this2.newChat(user.id, user.name);
+          window.Echo["private"]("messages.".concat(user.id, ".").concat(_this2.authuser.id)).listen("MessageSentEvent", function (event) {
+            console.log("hehehehe advancedchat");
+
+            _this2.newChat(user.name, user.id);
           });
         }
       });
     }).joining(function (user) {
-      //if a user was newly logged in then join the unique private channel, and listen to the new message event,
+      console.log("joined"); //if a user was newly logged in then join the unique private channel, and listen to the new message event,
       //then run the newChat function.
-      _this2.users.push(user);
 
-      window.Echo["private"]("messages.".concat(user.id, ".").concat(_this2.authuserid)).listen("MessageSentEvent", function (event) {
-        return _this2.newChat(user.id, user.name);
+      window.Echo["private"]("messages.".concat(user.id, ".").concat(_this2.authuser.id)).listen("MessageSentEvent", function (event) {
+        console.log("hehehehe advancedchat");
+
+        _this2.newChat(user.name, user.id);
       });
+
+      _this2.users.push(user);
     }).leaving(function (user) {
       //when a user logged out or left the web site then filter the users array,
       //the users array is automatically listed in the active users box.
@@ -2016,28 +2071,50 @@ __webpack_require__.r(__webpack_exports__);
         return user.id != u.id;
       });
     });
+    window.Echo["private"]("user.".concat(this.authuser.id)).listen("GroupCreatedEvent", function (event) {
+      console.log("group created");
+
+      _this2.groups.push(event.group);
+    });
   },
   methods: {
     toggleOpacity: function toggleOpacity() {
       this.opacityClass = !this.opacityClass;
     },
-    newChat: function newChat(id, name) {
+    toggleChatWrapper: function toggleChatWrapper() {
+      var chatWrapper = document.querySelector(".chat-wrapper");
+      var activeUsersBtn = document.querySelector(".activeUsersBtn");
+      var chatContainer = document.querySelector(".chat-container");
+
+      if (this.chatContainerToggledRight) {
+        this.chatContainerToggledRight = false;
+        chatContainer.style.paddingRight = "190px";
+      } else {
+        this.chatContainerToggledRight = true;
+        chatContainer.style.paddingRight = "80px";
+      }
+
+      activeUsersBtn.classList.toggle("toggleActiveUsersBtnRight");
+      chatWrapper.classList.toggle("toggleDisplay");
+    },
+    newChat: function newChat(name, id, groupid) {
       this.usersOpenedChatArray = JSON.parse(sessionStorage.getItem("usersOpenedChat")); //if window chat is opened with this user then do not put a new object in the usersOpenedChatArray,
       //this is why i am checking the usersOpenedChatArray.
 
       if (!this.usersOpenedChatArray.find(function (userChat) {
-        return userChat.id == id;
+        return userChat.name == name;
       })) {
         var userChat = {
           id: id,
-          name: name
+          name: name,
+          groupid: groupid
         };
         this.usersOpenedChatArray.push(userChat);
         sessionStorage.setItem("usersOpenedChat", JSON.stringify(this.usersOpenedChatArray));
       }
 
       var componentContainers = document.querySelectorAll(".componentContainer");
-      var alreadyExistedDiv = document.getElementById("componentContainer".concat(id)); //if there is a chat window existed with this user id then return false.
+      var alreadyExistedDiv = id ? document.getElementById("componentContainer".concat(id)) : document.getElementById("componentContainer".concat(name)); //if there is a chat window existed with this user id then return false.
 
       if (alreadyExistedDiv) return false; //if there are 3 opened chat windows and i wanna open a fourth one,
       //then remove the first one (MAXIMUM NUMBER OF 3 OPENED CHAT WINDOW)
@@ -2050,16 +2127,28 @@ __webpack_require__.r(__webpack_exports__);
 
       var chatContainer = document.querySelector(".chat-container");
       var componentContainer = document.createElement("div");
+      var componentConntainerId;
       componentContainer.classList.add("componentContainer", "chatBox");
-      componentContainer.setAttribute("id", "componentContainer".concat(id));
+
+      if (id !== undefined) {
+        componentConntainerId = "componentContainer".concat(id);
+        componentContainer.setAttribute("id", componentConntainerId);
+      } else {
+        componentConntainerId = "componentContainer".concat(name);
+        componentContainer.setAttribute("id", componentConntainerId);
+      }
+
       var vuecomp = Vue.extend(_NewChatBoxComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
       var comp = new vuecomp({
         propsData: {
-          fromUserID: this.authuserid,
+          fromUserID: this.authuser.id,
           toUserID: id,
-          panelFooter: "panel-footer-".concat(id),
+          panelFooter: id !== undefined ? "panel-footer-".concat(id) : "panel-footer-".concat(name),
           userName: name,
-          usersOpenedChatArray: this.usersOpenedChatArray
+          usersOpenedChatArray: this.usersOpenedChatArray,
+          componentID: componentConntainerId,
+          groupID: groupid,
+          authuser: this.authuser
         }
       }).$mount(componentContainer);
       componentContainer.append(comp.$el);
@@ -2122,6 +2211,20 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2307,7 +2410,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ["chatBoxStyle", "userName", "panelFooter", "fromUserID", "toUserID", "usersOpenedChatArray"],
+  props: ["chatBoxStyle", "userName", "panelFooter", "fromUserID", "toUserID", "usersOpenedChatArray", "componentID", "groupID", "authuser"],
   mounted: function mounted() {},
   data: function data() {
     return {
@@ -2316,7 +2419,9 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       users: [],
       opacityClass: false,
       time: new Date(),
-      image: null
+      image: null,
+      recorder: null,
+      input: null
     };
   },
   created: function created() {
@@ -2324,10 +2429,18 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
     //when the component is created run the fetchMessages function, and join the unique private channel,
     //and listen to the message sent event, and if a message was sent push it in the messages array.
-    this.fetchMessages(this.fromUserID, this.toUserID);
+    this.fetchMessages(this.fromUserID, this.toUserID, this.groupID);
     window.Echo["private"]("messages.".concat(this.toUserID, ".").concat(this.fromUserID)).listen("MessageSentEvent", function (event) {
       return _this.messages.push(event.message);
     });
+
+    if (this.groupID) {
+      window.Echo["private"]("group.".concat(this.groupID)).listen("MessageSentEvent", function (event) {
+        return _this.messages.push(event.message);
+      });
+    }
+
+    console.log(this.userName);
   },
   methods: {
     //this method is resonsable for toggling the chatBox opacity.
@@ -2335,41 +2448,48 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       event.target.closest("div").querySelector(".chat-wrapper").style.marginRight += "".concat(this.componentContainersWidth, "px");
       this.opacityClass = !this.opacityClass;
     },
-    fetchMessages: function fetchMessages(from, to) {
+    fetchMessages: function fetchMessages(from, to, groupid) {
       var _this2 = this;
 
       //get all messages between these 2 users and pass the returned messages to the messages array
-      axios.get("/messages?from=".concat(from, "&to=").concat(to)).then(function (response) {
+      axios.get("/messages?from=".concat(from, "&to=").concat(to, "&groupid=").concat(groupid)).then(function (response) {
         return _this2.messages = response.data;
       });
     },
     sendMessage: function sendMessage(event) {
+      var _this$messages$push;
+
       //send a new message to the backend and push this message to the messages array,
       //so that it appears in the chat box to the user that sent it.
       if (this.newMessage === "") return false;
       axios.post("/chat", {
         message: this.newMessage,
         fromUser: this.fromUserID,
-        toUser: this.toUserID
+        toUser: this.toUserID,
+        groupID: this.groupID
       }).then(function (resonse) {
         return console.log(resonse.data.message);
       });
       var time = new Date();
-      this.messages.push({
+      this.messages.push((_this$messages$push = {
         message: this.newMessage,
         user: this.user,
-        time: time.toLocaleString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true
-        })
-      });
+        from: this.fromUserID
+      }, _defineProperty(_this$messages$push, "user", {
+        name: this.authuser.name
+      }), _defineProperty(_this$messages$push, "created_at", time.toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        hour12: false
+      })), _this$messages$push));
       this.newMessage = "";
     },
     sendFile: function sendFile(event) {
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
+        var _this3$messages$push;
+
         var data, response, time;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
@@ -2381,26 +2501,29 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 data.append("image", event.target.files[0]);
                 data.append("toUser", _this3.toUserID);
                 data.append("fromUser", _this3.fromUserID);
-                _context.next = 7;
+                data.append("groupID", _this3.groupID);
+                _context.next = 8;
                 return axios.post("/chat", data);
 
-              case 7:
+              case 8:
                 response = _context.sent;
                 time = new Date();
 
-                _this3.messages.push({
+                _this3.messages.push((_this3$messages$push = {
                   message: _this3.newMessage,
                   user: _this3.user,
                   file: response.data.message.file,
                   type: "file",
-                  time: time.toLocaleString("en-US", {
-                    hour: "numeric",
-                    minute: "numeric",
-                    hour12: true
-                  })
-                });
+                  from: _this3.fromUserID
+                }, _defineProperty(_this3$messages$push, "user", {
+                  name: _this3.authuser.name
+                }), _defineProperty(_this3$messages$push, "time", time.toLocaleString("en-US", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true
+                })), _this3$messages$push));
 
-              case 10:
+              case 11:
               case "end":
                 return _context.stop();
             }
@@ -2412,6 +2535,8 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
+        var _this4$messages$push;
+
         var data, response, time;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
@@ -2433,32 +2558,105 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 data.append("image", event.target.files[0]);
                 data.append("toUser", _this4.toUserID);
                 data.append("fromUser", _this4.fromUserID);
-                _context2.next = 10;
+                data.append("groupID", _this4.groupID);
+                _context2.next = 11;
                 return axios.post("/chat", data);
 
-              case 10:
+              case 11:
                 response = _context2.sent;
                 time = new Date();
 
-                _this4.messages.push({
+                _this4.messages.push((_this4$messages$push = {
                   message: _this4.newMessage,
                   user: _this4.user,
                   file: response.data.message.file,
                   type: "image",
-                  time: time.toLocaleString("en-US", {
-                    hour: "numeric",
-                    minute: "numeric",
-                    hour12: true
-                  })
-                });
+                  from: _this4.fromUserID
+                }, _defineProperty(_this4$messages$push, "user", {
+                  name: _this4.authuser.name
+                }), _defineProperty(_this4$messages$push, "time", time.toLocaleString("en-US", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true
+                })), _this4$messages$push));
 
-              case 13:
+              case 14:
               case "end":
                 return _context2.stop();
             }
           }
         }, _callee2);
       }))();
+    },
+    startRecording: function startRecording(event) {
+      var _this5 = this;
+
+      var audioContext = new AudioContext();
+      var recordingBtn = event.target;
+      var stopRecordingBtn = recordingBtn.nextElementSibling;
+      stopRecordingBtn.style.marginLeft = "100px";
+      stopRecordingBtn.style.display = "block";
+      recordingBtn.style.display = "none";
+      navigator.mediaDevices.getUserMedia({
+        audio: true
+      }).then(function (stream) {
+        console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+        /* assign to gumStream for later use */
+        // audioStream = stream;
+
+        /* use the stream */
+
+        _this5.input = audioContext.createMediaStreamSource(stream);
+        /* Create the Recorder object and configure to record mono sound (1 channel) Recording 2 channels will double the file size */
+
+        _this5.recorder = new Recorder(_this5.input); // //start the recording process
+
+        _this5.recorder.record();
+
+        console.log("Recording started");
+      })["catch"](function (err) {
+        //enable the record button if getUserMedia() fails
+        console.log(err);
+      });
+    },
+    stopRecording: function stopRecording(event) {
+      this.recorder.stop();
+      var stopRecordingBtn = event.target;
+      var startRecordingBtn = document.querySelector(".fa-microphone");
+      startRecordingBtn.style.marginLeft = "100px";
+      startRecordingBtn.style.display = "block";
+      stopRecordingBtn.style.display = "none";
+      this.recorder.exportWAV(this.createDownloadLink);
+    },
+    createDownloadLink: function createDownloadLink(blob) {
+      var _this6 = this;
+
+      console.log(blob);
+      var formdata = new FormData();
+      formdata.append("image", blob);
+      formdata.append("toUser", this.toUserID);
+      formdata.append("fromUser", this.fromUserID);
+      formdata.append("groupID", this.groupID);
+      axios.post("/chat", formdata).then(function (response) {
+        var _this6$messages$push;
+
+        console.log(response);
+        var time = new Date();
+
+        _this6.messages.push((_this6$messages$push = {
+          message: _this6.newMessage,
+          user: _this6.user,
+          file: response.data.message.file,
+          type: "audio",
+          from: _this6.fromUserID
+        }, _defineProperty(_this6$messages$push, "user", {
+          name: _this6.authuser.name
+        }), _defineProperty(_this6$messages$push, "time", time.toLocaleString("en-US", {
+          hour: "numeric",
+          minute: "numeric",
+          hour12: true
+        })), _this6$messages$push));
+      });
     },
     minimize: function minimize(value) {
       //this message is responsible for minimizing the chat box.
@@ -2479,12 +2677,20 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
         expandSpan.classList.add("fa-minus");
       }
     },
-    removeDiv: function removeDiv(divClass, userID) {
+    removeDiv: function removeDiv(divClass, userID, groupID) {
       //this method is responsible for closing the chat box and updating the array in the session storage
       var previouslyOpenedUsersChats = JSON.parse(sessionStorage.getItem("usersOpenedChat"));
-      previouslyOpenedUsersChats = previouslyOpenedUsersChats.filter(function (el) {
-        return el.id != userID;
-      });
+
+      if (groupID !== undefined) {
+        previouslyOpenedUsersChats = previouslyOpenedUsersChats.filter(function (el) {
+          return el.groupid !== groupID;
+        });
+      } else {
+        previouslyOpenedUsersChats = previouslyOpenedUsersChats.filter(function (el) {
+          return el.id !== userID;
+        });
+      }
+
       sessionStorage.setItem("usersOpenedChat", JSON.stringify(previouslyOpenedUsersChats));
       document.getElementById("".concat(divClass)).remove();
     }
@@ -6947,7 +7153,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\nbody[data-v-0d3e177c] {\n  background-color: #eee;\n}\n[data-v-0d3e177c]::-webkit-scrollbar {\n  width: 10px;\n}\n\n/* Track */\n[data-v-0d3e177c]::-webkit-scrollbar-track {\n  box-shadow: inset 0 0 5px grey;\n  border-radius: 10px;\n}\n\n/* Handle */\n[data-v-0d3e177c]::-webkit-scrollbar-thumb {\n  background: blue;\n  border-radius: 10px;\n}\n\n/* Handle on hover */\n[data-v-0d3e177c]::-webkit-scrollbar-thumb:hover {\n  background: #b30000;\n}\n.toggleOpacityClass[data-v-0d3e177c] {\n  opacity: 1 !important;\n}\n.chat-btn[data-v-0d3e177c] {\n  position: fixed;\n  right: 14px;\n  cursor: pointer;\n  width: 50px;\n  height: 50px;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  border-radius: 50px;\n  background-color: blue;\n  color: #fff;\n  font-size: 22px;\n  border: none;\n  z-index: 10;\n}\n.chat-btn .close[data-v-0d3e177c] {\n  display: none;\n}\n.chat-btn i[data-v-0d3e177c] {\n  transition: all 0.9s ease;\n}\n#check:checked ~ .chat-btn i[data-v-0d3e177c] {\n  display: block;\n  pointer-events: auto;\n  /* transform: rotate(180deg) */\n}\n#check:checked ~ .chat-btn .fa-commenting[data-v-0d3e177c] {\n  display: none;\n}\n.chat-btn i[data-v-0d3e177c] {\n  font-size: 22px;\n  color: #fff !important;\n}\n#check:checked ~ .chat-wrapper[data-v-0d3e177c] {\n  opacity: 1;\n}\n.header[data-v-0d3e177c] {\n  padding: 13px;\n  background-color: blue;\n  border-radius: 5px 5px 0px 0px;\n  margin-bottom: 10px;\n  color: #fff;\n}\n.chat-form[data-v-0d3e177c] {\n  padding: 15px;\n}\n.chat-form input[data-v-0d3e177c],\ntextarea[data-v-0d3e177c],\nbutton[data-v-0d3e177c] {\n  margin-bottom: 10px;\n}\n.chat-form textarea[data-v-0d3e177c] {\n  resize: none;\n}\n.form-control[data-v-0d3e177c]:focus,\n.btn[data-v-0d3e177c]:focus {\n  box-shadow: none;\n}\n.btn[data-v-0d3e177c],\n.btn[data-v-0d3e177c]:focus,\n.btn[data-v-0d3e177c]:hover {\n  background-color: blue;\n  border: blue;\n}\n#check[data-v-0d3e177c] {\n  display: none !important;\n}\n", ""]);
+exports.push([module.i, "\nbody[data-v-0d3e177c] {\n  background-color: #eee;\n}\n[data-v-0d3e177c]::-webkit-scrollbar {\n  width: 10px;\n}\n\n/* Track */\n[data-v-0d3e177c]::-webkit-scrollbar-track {\n  box-shadow: inset 0 0 5px grey;\n  border-radius: 10px;\n}\n\n/* Handle */\n[data-v-0d3e177c]::-webkit-scrollbar-thumb {\n  background: blue;\n  border-radius: 10px;\n}\n\n/* Handle on hover */\n[data-v-0d3e177c]::-webkit-scrollbar-thumb:hover {\n  background: #b30000;\n}\n.toggleOpacityClass[data-v-0d3e177c] {\n  opacity: 1 !important;\n}\n.toggleDisplay[data-v-0d3e177c] {\n  display: none;\n}\n.toggleActiveUsersBtnRight[data-v-0d3e177c] {\n  position: fixed;\n  bottom: 15px;\n}\n.chat-btn[data-v-0d3e177c] {\n  position: fixed;\n  right: 14px;\n  cursor: pointer;\n  width: 50px;\n  height: 50px;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  border-radius: 50px;\n  background-color: blue;\n  color: #fff;\n  font-size: 22px;\n  border: none;\n  z-index: 10;\n}\n.chat-btn .close[data-v-0d3e177c] {\n  display: none;\n}\n.chat-btn i[data-v-0d3e177c] {\n  transition: all 0.9s ease;\n}\n#check:checked ~ .chat-btn i[data-v-0d3e177c] {\n  display: block;\n  pointer-events: auto;\n  /* transform: rotate(180deg) */\n}\n#check:checked ~ .chat-btn .fa-commenting[data-v-0d3e177c] {\n  display: none;\n}\n.chat-btn i[data-v-0d3e177c] {\n  font-size: 22px;\n  color: #fff !important;\n}\n#check:checked ~ .chat-wrapper[data-v-0d3e177c] {\n  opacity: 1;\n}\n.header[data-v-0d3e177c] {\n  padding: 13px;\n  background-color: blue;\n  border-radius: 5px 5px 0px 0px;\n  margin-bottom: 10px;\n  color: #fff;\n}\n.chat-form[data-v-0d3e177c] {\n  padding: 15px;\n}\n.chat-form input[data-v-0d3e177c],\ntextarea[data-v-0d3e177c],\nbutton[data-v-0d3e177c] {\n  margin-bottom: 10px;\n}\n.chat-form textarea[data-v-0d3e177c] {\n  resize: none;\n}\n.form-control[data-v-0d3e177c]:focus,\n.btn[data-v-0d3e177c]:focus {\n  box-shadow: none;\n}\n.btn[data-v-0d3e177c],\n.btn[data-v-0d3e177c]:focus,\n.btn[data-v-0d3e177c]:hover {\n  background-color: blue;\n  border: blue;\n}\n#check[data-v-0d3e177c] {\n  display: none !important;\n}\n", ""]);
 
 // exports
 
@@ -45831,7 +46037,38 @@ var render = function() {
         _vm._v(" "),
         _vm._m(1),
         _vm._v(" "),
-        _c("div", { staticClass: "chat-form" }),
+        _c("div", [
+          _c(
+            "ul",
+            {
+              staticClass: "chat-users-list",
+              staticStyle: { height: "auto", "overflow-y": "scroll" }
+            },
+            _vm._l(_vm.groups, function(group, index) {
+              return _c("li", { key: index }, [
+                _c(
+                  "a",
+                  {
+                    attrs: { href: "#chat" },
+                    on: {
+                      click: function($event) {
+                        return _vm.newChat(
+                          "group-" + group.name,
+                          undefined,
+                          group.id
+                        )
+                      }
+                    }
+                  },
+                  [_vm._v(_vm._s(group.name))]
+                )
+              ])
+            }),
+            0
+          )
+        ]),
+        _vm._v(" "),
+        _vm._m(2),
         _vm._v(" "),
         _c("div", [
           _c(
@@ -45848,7 +46085,7 @@ var render = function() {
                     attrs: { href: "#chat" },
                     on: {
                       click: function($event) {
-                        return _vm.newChat(user.id, user.name, _vm.authuserid)
+                        return _vm.newChat(user.name, user.id)
                       }
                     }
                   },
@@ -45870,6 +46107,16 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "header" }, [
       _c("h6", [_vm._v("Let's Chat - Online")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "text-center p-2" }, [
+      _c("strong", { staticStyle: { color: "black" } }, [
+        _vm._v("Joined Groups!")
+      ])
     ])
   },
   function() {
@@ -45956,16 +46203,21 @@ var render = function() {
       _c("div", { staticClass: "col-xs-12 col-md-12 p-0" }, [
         _c("div", { staticClass: "panel panel-default" }, [
           _c("div", { staticClass: "panel-heading top-bar" }, [
-            _c("div", { staticClass: "col-md-8 col-xs-8" }, [
-              _c("h3", { staticClass: "panel-title" }, [
-                _c("span", { staticClass: "glyphicon glyphicon-comment" }),
-                _vm._v(
-                  "Chat with\n              " +
-                    _vm._s(_vm.userName) +
-                    "\n            "
-                )
-              ])
-            ]),
+            _c(
+              "div",
+              {
+                staticClass: "col-md-8 col-xs-8",
+                staticStyle: { display: "contents" }
+              },
+              [
+                _c("h3", { staticClass: "panel-title" }, [
+                  _c("span", { staticClass: "glyphicon glyphicon-comment" }),
+                  _vm._v(
+                    "\n              " + _vm._s(_vm.userName) + "\n            "
+                  )
+                ])
+              ]
+            ),
             _vm._v(" "),
             _c("div", { staticClass: "col-md-4 col-xs-4" }, [
               _c("a", { attrs: { href: "#" } }, [
@@ -45987,8 +46239,9 @@ var render = function() {
                   on: {
                     click: function($event) {
                       return _vm.removeDiv(
-                        "componentContainer" + _vm.toUserID,
-                        _vm.toUserID
+                        "" + _vm.componentID,
+                        _vm.toUserID,
+                        _vm.groupID
                       )
                     }
                   }
@@ -46006,20 +46259,20 @@ var render = function() {
             },
             _vm._l(_vm.messages, function(message, index) {
               return _c("li", { key: index }, [
-                message.from == _vm.toUserID
+                message.from === _vm.fromUserID
                   ? _c("div", [
                       _c(
                         "div",
-                        { staticClass: "row msg_container base_sent" },
+                        { staticClass: "row msg_container base_receive" },
                         [
                           _c("div", { staticClass: "col-md-10 col-xs-10" }, [
                             _c(
                               "div",
                               {
-                                staticClass: "messages msg_sent",
+                                staticClass: "messages msg_receive",
                                 staticStyle: {
-                                  "background-color": "#0078ff",
-                                  color: "white",
+                                  "background-color": "#b8b8b8",
+                                  color: "black",
                                   "border-radius": "20px"
                                 }
                               },
@@ -46032,9 +46285,105 @@ var render = function() {
                                     }
                                   },
                                   [
+                                    _c("strong", [
+                                      _vm._v(
+                                        _vm._s(message.user.name) + " said: "
+                                      )
+                                    ]),
                                     _vm._v(
-                                      "\n                      " +
-                                        _vm._s(message.message) +
+                                      _vm._s(message.message) +
+                                        "\n                    "
+                                    )
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "time",
+                                  { staticStyle: { color: "black" } },
+                                  [_vm._v(_vm._s(message.created_at))]
+                                ),
+                                _vm._v(" "),
+                                message.type == "image"
+                                  ? _c("img", {
+                                      staticStyle: {
+                                        height: "150px",
+                                        width: "150px"
+                                      },
+                                      attrs: {
+                                        src: "/chat/" + message.file,
+                                        alt: ""
+                                      }
+                                    })
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                message.type == "file"
+                                  ? _c(
+                                      "a",
+                                      {
+                                        staticStyle: { color: "black" },
+                                        attrs: {
+                                          href: "chat/" + message.file,
+                                          download: ""
+                                        }
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass: "fas fa-paperclip"
+                                        })
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                message.type == "audio"
+                                  ? _c("audio", {
+                                      staticStyle: {
+                                        width: "-webkit-fill-available"
+                                      },
+                                      attrs: {
+                                        controls: "true",
+                                        src: "/chat/" + message.file
+                                      }
+                                    })
+                                  : _vm._e()
+                              ]
+                            )
+                          ])
+                        ]
+                      )
+                    ])
+                  : _c("div", [
+                      _c(
+                        "div",
+                        { staticClass: "row msg_container base_sent" },
+                        [
+                          _c("div", { staticClass: "col-md-10 col-xs-10" }, [
+                            _c(
+                              "div",
+                              {
+                                staticClass: "messages msg_sent",
+                                staticStyle: {
+                                  "background-color": "#0078ff",
+                                  color: "black",
+                                  "border-radius": "20px"
+                                }
+                              },
+                              [
+                                _c(
+                                  "p",
+                                  {
+                                    staticStyle: {
+                                      "overflow-wrap": "break-word",
+                                      color: "white"
+                                    }
+                                  },
+                                  [
+                                    _c("strong", [
+                                      _vm._v(
+                                        _vm._s(message.user.name) + " said: "
+                                      )
+                                    ]),
+                                    _vm._v(
+                                      _vm._s(message.message) +
                                         "\n                    "
                                     )
                                   ]
@@ -46075,89 +46424,18 @@ var render = function() {
                                         })
                                       ]
                                     )
-                                  : _vm._e()
-                              ]
-                            )
-                          ])
-                        ]
-                      )
-                    ])
-                  : _c("div", [
-                      _c(
-                        "div",
-                        { staticClass: "row msg_container base_receive" },
-                        [
-                          _c("div", { staticClass: "col-md-10 col-xs-10" }, [
-                            _c(
-                              "div",
-                              {
-                                staticClass: "messages msg_receive",
-                                staticStyle: {
-                                  "background-color": "#B8B8B8",
-                                  "border-radius": "20px"
-                                }
-                              },
-                              [
-                                _c(
-                                  "p",
-                                  {
-                                    staticStyle: {
-                                      "overflow-wrap": "break-word",
-                                      color: "black"
-                                    }
-                                  },
-                                  [
-                                    _vm._v(
-                                      "\n                      " +
-                                        _vm._s(message.message) +
-                                        "\n                    "
-                                    )
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "time",
-                                  { staticStyle: { color: "black" } },
-                                  [
-                                    _vm._v(
-                                      _vm._s(
-                                        message.time
-                                          ? message.time
-                                          : message.created_at
-                                      )
-                                    )
-                                  ]
-                                ),
-                                _vm._v(" "),
-                                message.type == "image"
-                                  ? _c("img", {
-                                      staticStyle: {
-                                        height: "150px",
-                                        width: "150px"
-                                      },
-                                      attrs: {
-                                        src: "/chat/" + message.file,
-                                        alt: ""
-                                      }
-                                    })
                                   : _vm._e(),
                                 _vm._v(" "),
-                                message.type == "file"
-                                  ? _c(
-                                      "a",
-                                      {
-                                        staticStyle: { color: "black" },
-                                        attrs: {
-                                          href: "chat/" + message.file,
-                                          download: ""
-                                        }
+                                message.type == "audio"
+                                  ? _c("audio", {
+                                      staticStyle: {
+                                        width: "-webkit-fill-available"
                                       },
-                                      [
-                                        _c("i", {
-                                          staticClass: "fas fa-paperclip"
-                                        })
-                                      ]
-                                    )
+                                      attrs: {
+                                        controls: "true",
+                                        src: "/chat/" + message.file
+                                      }
+                                    })
                                   : _vm._e()
                               ]
                             )
@@ -46234,6 +46512,28 @@ var render = function() {
                 },
                 attrs: { accept: "application/*", type: "file" },
                 on: { change: _vm.sendFile }
+              }),
+              _vm._v(" "),
+              _c("i", {
+                staticClass: "fa fa-microphone",
+                staticStyle: {
+                  cursor: "pointer",
+                  "font-size": "25px",
+                  "margin-left": "100px",
+                  "margin-top": "3px"
+                },
+                on: { click: _vm.startRecording }
+              }),
+              _vm._v(" "),
+              _c("i", {
+                staticClass: "fas fa-stop-circle",
+                staticStyle: {
+                  cursor: "pointer",
+                  "font-size": "25px",
+                  "margin-top": "3px",
+                  display: "none"
+                },
+                on: { click: _vm.stopRecording }
               })
             ])
           ])

@@ -40,6 +40,10 @@ class MessageSentEvent implements ShouldBroadcastNow
     public function broadcastOn()
     {
         // return new PrivateChannel('joinChat-channel');
+        if ($this->message->group_id !== null) {
+            return new PrivateChannel("group." . $this->message->group_id);
+            // return new PrivateChannel("user." . $this->authUser);
+        }
         return new PrivateChannel("messages." . $this->authUser . "." . $this->toUser);
     }
 

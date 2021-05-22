@@ -25,7 +25,7 @@
 .chat-container {
     position: fixed;
     /* right: 20px; */
-    padding-right:220px;
+    padding-right:230px;
     bottom: 0px;
     width: 100%;
     z-index: 10;
@@ -45,7 +45,7 @@
     }
   
     .chat-container {
-      padding-right: 120px;
+      padding-right: 210px;
     }
 
     .chatBox {
@@ -58,7 +58,8 @@
     }
 
     .activeUsersBox {
-        margin-left:70px
+        margin-left:10px;
+        margin-right:10px;
     }
 
   }

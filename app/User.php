@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Group;
 use App\Message;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -41,5 +42,10 @@ class User extends Authenticatable
     public function messages()
     {
         return $this->hasMany(Message::class, 'from', 'id');
+    }
+
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'groups_users', 'user_id', 'group_id');
     }
 }

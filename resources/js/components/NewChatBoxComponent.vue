@@ -4,9 +4,9 @@
       <div class="col-xs-12 col-md-12 p-0">
         <div class="panel panel-default">
           <div class="panel-heading top-bar">
-            <div class="col-md-8 col-xs-8">
+            <div class="col-md-8 col-xs-8" style="display: contents">
               <h3 class="panel-title">
-                <span class="glyphicon glyphicon-comment"></span>Chat with
+                <span class="glyphicon glyphicon-comment"></span>
                 {{ userName }}
               </h3>
             </div>
@@ -21,7 +21,7 @@
               <a href="#"
                 ><span
                   class="fas fa-times icon_close"
-                  @click="removeDiv(`componentContainer${toUserID}`, toUserID)"
+                  @click="removeDiv(`${componentID}`, toUserID, groupID)"
                   data-id="chat_window_1"
                 ></span
               ></a>
@@ -33,60 +33,63 @@
             v-chat-scroll
           >
             <li v-for="(message, index) in messages" :key="index">
-              <div v-if="message.from == toUserID">
+              <div v-if="message.from === fromUserID">
+                <div class="row msg_container base_receive">
+                  <div class="col-md-10 col-xs-10">
+                    <div
+                      class="messages msg_receive"
+                      style="
+                        background-color: #b8b8b8;
+                        color: black;
+                        border-radius: 20px;
+                      "
+                    >
+                      <p style="overflow-wrap: break-word">
+                        <strong>{{ message.user.name }} said: </strong
+                        >{{ message.message }}
+                      </p>
+                      <!-- <time>{{message.created_at | moment("from", "now")}}</time> -->
+                      <time style="color: black">{{ message.created_at }}</time>
+                      <img
+                        style="height: 150px; width: 150px"
+                        v-if="message.type == 'image'"
+                        :src="'/chat/' + message.file"
+                        alt=""
+                      />
+                      <a
+                        :href="'chat/' + message.file"
+                        download
+                        style="color: black"
+                        v-if="message.type == 'file'"
+                        ><i class="fas fa-paperclip"></i
+                      ></a>
+
+                      <audio
+                        controls="true"
+                        :src="'/chat/' + message.file"
+                        v-if="message.type == 'audio'"
+                        style="width: -webkit-fill-available"
+                      ></audio>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else>
                 <div class="row msg_container base_sent">
                   <div class="col-md-10 col-xs-10">
                     <div
                       class="messages msg_sent"
                       style="
                         background-color: #0078ff;
-                        color: white;
-                        border-radius: 20px;
-                      "
-                    >
-                      <p style="overflow-wrap: break-word">
-                        {{ message.message }}
-                      </p>
-                      <!-- <time>{{message.created_at | moment("from", "now")}}</time> -->
-                      <time style="color: white">{{ message.created_at }}</time>
-                      <img
-                        style="height: 150px; width: 150px"
-                        v-if="message.type == 'image'"
-                        :src="'/chat/' + message.file"
-                        alt=""
-                      />
-                      <a
-                        :href="'chat/' + message.file"
-                        download
-                        style="color: black"
-                        v-if="message.type == 'file'"
-                        ><i class="fas fa-paperclip"></i
-                      ></a>
-                    </div>
-                  </div>
-                  <!-- <div class="col-md-2 col-xs-2 avatar">
-                                        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg"
-                                            class=" img-responsive ">
-                                    </div> -->
-                </div>
-              </div>
-              <div v-else>
-                <div class="row msg_container base_receive">
-                  <div class="col-md-10 col-xs-10">
-                    <div
-                      class="messages msg_receive"
-                      style="
-                        background-color: #B8B8B8
                         color: black;
                         border-radius: 20px;
                       "
                     >
-                      <p style="overflow-wrap: break-word; color: black">
-                        {{ message.message }}
+                      <p style="overflow-wrap: break-word; color: white">
+                        <strong>{{ message.user.name }} said: </strong
+                        >{{ message.message }}
                       </p>
-                      <time style="color: black">{{
-                        message.time ? message.time : message.created_at
-                      }}</time>
+                      <time style="color: white">{{ message.created_at }}</time>
 
                       <img
                         style="height: 150px; width: 150px"
@@ -103,25 +106,20 @@
                         ><i class="fas fa-paperclip"></i
                       ></a>
 
+                      <audio
+                        controls="true"
+                        :src="'/chat/' + message.file"
+                        v-if="message.type == 'audio'"
+                        style="width: -webkit-fill-available"
+                      ></audio>
                       <!-- <time>{{
                         message.created_at | moment("from", "now")
                       }}</time> -->
                     </div>
                   </div>
-                  <!-- <div class="col-md-2 col-xs-2 avatar">
-                                        <img src="http://www.bitrebels.com/wp-content/uploads/2011/02/Original-Facebook-Geek-Profile-Avatar-1.jpg"
-                                            class=" img-responsive ">
-                                    </div> -->
                 </div>
               </div>
             </li>
-
-            <!-- <ul style="height:252px;overflow-y:scroll" class="list-unstyled" v-chat-scroll>
-                    <li v-for="(message, index) in messages" :key="index" style="margin-bottom:10px">
-                    <strong>{{ message.user.name }}</strong>
-                        {{message.message}}
-                    </li>
-                </ul> -->
           </ul>
           <div class="panel-footer" :class="panelFooter">
             <div class="input-group">
@@ -165,12 +163,26 @@
                 class="fas fa-paperclip"
                 @change="sendFile"
               />
-
-              <!-- <span class="input-group-btn">
-                <button class="btn btn-primary btn-sm btn-chat" id="btn-chat">
-                  Send
-                </button>
-              </span> -->
+              <i
+                class="fa fa-microphone"
+                style="
+                  cursor: pointer;
+                  font-size: 25px;
+                  margin-left: 100px;
+                  margin-top: 3px;
+                "
+                @click="startRecording"
+              ></i>
+              <i
+                class="fas fa-stop-circle"
+                style="
+                  cursor: pointer;
+                  font-size: 25px;
+                  margin-top: 3px;
+                  display: none;
+                "
+                @click="stopRecording"
+              ></i>
             </div>
           </div>
         </div>
@@ -179,7 +191,7 @@
   </div>
 </template>
 
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
 <script>
 import $ from "jquery";
 window.Vue = require("vue");
@@ -192,6 +204,9 @@ export default {
     "fromUserID",
     "toUserID",
     "usersOpenedChatArray",
+    "componentID",
+    "groupID",
+    "authuser",
   ],
   mounted() {},
   data() {
@@ -202,15 +217,25 @@ export default {
       opacityClass: false,
       time: new Date(),
       image: null,
+      recorder: null,
+      input: null,
     };
   },
   created() {
     //when the component is created run the fetchMessages function, and join the unique private channel,
     //and listen to the message sent event, and if a message was sent push it in the messages array.
-    this.fetchMessages(this.fromUserID, this.toUserID);
+    this.fetchMessages(this.fromUserID, this.toUserID, this.groupID);
     window.Echo.private(
       `messages.${this.toUserID}.${this.fromUserID}`
     ).listen("MessageSentEvent", (event) => this.messages.push(event.message));
+
+    if (this.groupID) {
+      window.Echo.private(`group.${this.groupID}`).listen(
+        "MessageSentEvent",
+        (event) => this.messages.push(event.message)
+      );
+    }
+    console.log(this.userName);
   },
 
   methods: {
@@ -224,10 +249,10 @@ export default {
       this.opacityClass = !this.opacityClass;
     },
 
-    fetchMessages(from, to) {
+    fetchMessages(from, to, groupid) {
       //get all messages between these 2 users and pass the returned messages to the messages array
       axios
-        .get(`/messages?from=${from}&to=${to}`)
+        .get(`/messages?from=${from}&to=${to}&groupid=${groupid}`)
         .then((response) => (this.messages = response.data));
     },
 
@@ -240,16 +265,19 @@ export default {
           message: this.newMessage,
           fromUser: this.fromUserID,
           toUser: this.toUserID,
+          groupID: this.groupID,
         })
         .then((resonse) => console.log(resonse.data.message));
       const time = new Date();
       this.messages.push({
         message: this.newMessage,
         user: this.user,
-        time: time.toLocaleString("en-US", {
+        from: this.fromUserID,
+        user: { name: this.authuser.name },
+        created_at: time.toLocaleString("en-US", {
           hour: "numeric",
           minute: "numeric",
-          hour12: true,
+          hour12: false,
         }),
       });
       this.newMessage = "";
@@ -262,6 +290,7 @@ export default {
       data.append("image", event.target.files[0]);
       data.append("toUser", this.toUserID);
       data.append("fromUser", this.fromUserID);
+      data.append("groupID", this.groupID);
       const response = await axios.post("/chat", data);
       const time = new Date();
 
@@ -270,6 +299,8 @@ export default {
         user: this.user,
         file: response.data.message.file,
         type: "file",
+        from: this.fromUserID,
+        user: { name: this.authuser.name },
         time: time.toLocaleString("en-US", {
           hour: "numeric",
           minute: "numeric",
@@ -289,6 +320,7 @@ export default {
       data.append("image", event.target.files[0]);
       data.append("toUser", this.toUserID);
       data.append("fromUser", this.fromUserID);
+      data.append("groupID", this.groupID);
       const response = await axios.post("/chat", data);
       const time = new Date();
 
@@ -297,11 +329,78 @@ export default {
         user: this.user,
         file: response.data.message.file,
         type: "image",
+        from: this.fromUserID,
+        user: { name: this.authuser.name },
         time: time.toLocaleString("en-US", {
           hour: "numeric",
           minute: "numeric",
           hour12: true,
         }),
+      });
+    },
+
+    startRecording(event) {
+      const audioContext = new AudioContext();
+      const recordingBtn = event.target;
+      const stopRecordingBtn = recordingBtn.nextElementSibling;
+      stopRecordingBtn.style.marginLeft = "100px";
+      stopRecordingBtn.style.display = "block";
+      recordingBtn.style.display = "none";
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => {
+          console.log(
+            "getUserMedia() success, stream created, initializing Recorder.js ..."
+          );
+          /* assign to gumStream for later use */
+          // audioStream = stream;
+          /* use the stream */
+          this.input = audioContext.createMediaStreamSource(stream);
+          /* Create the Recorder object and configure to record mono sound (1 channel) Recording 2 channels will double the file size */
+          this.recorder = new Recorder(this.input);
+          // //start the recording process
+          this.recorder.record();
+          console.log("Recording started");
+        })
+        .catch(function (err) {
+          //enable the record button if getUserMedia() fails
+          console.log(err);
+        });
+    },
+
+    stopRecording(event) {
+      this.recorder.stop();
+      const stopRecordingBtn = event.target;
+      const startRecordingBtn = document.querySelector(".fa-microphone");
+      startRecordingBtn.style.marginLeft = "100px";
+      startRecordingBtn.style.display = "block";
+      stopRecordingBtn.style.display = "none";
+      this.recorder.exportWAV(this.createDownloadLink);
+    },
+
+    createDownloadLink(blob) {
+      console.log(blob);
+      const formdata = new FormData();
+      formdata.append("image", blob);
+      formdata.append("toUser", this.toUserID);
+      formdata.append("fromUser", this.fromUserID);
+      formdata.append("groupID", this.groupID);
+      axios.post("/chat", formdata).then((response) => {
+        console.log(response);
+        const time = new Date();
+        this.messages.push({
+          message: this.newMessage,
+          user: this.user,
+          file: response.data.message.file,
+          type: "audio",
+          from: this.fromUserID,
+          user: { name: this.authuser.name },
+          time: time.toLocaleString("en-US", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+          }),
+        });
       });
     },
 
@@ -325,15 +424,21 @@ export default {
         expandSpan.classList.add("fa-minus");
       }
     },
-    removeDiv(divClass, userID) {
+    removeDiv(divClass, userID, groupID) {
       //this method is responsible for closing the chat box and updating the array in the session storage
       let previouslyOpenedUsersChats = JSON.parse(
         sessionStorage.getItem("usersOpenedChat")
       );
 
-      previouslyOpenedUsersChats = previouslyOpenedUsersChats.filter((el) => {
-        return el.id != userID;
-      });
+      if (groupID !== undefined) {
+        previouslyOpenedUsersChats = previouslyOpenedUsersChats.filter((el) => {
+          return el.groupid !== groupID;
+        });
+      } else {
+        previouslyOpenedUsersChats = previouslyOpenedUsersChats.filter((el) => {
+          return el.id !== userID;
+        });
+      }
 
       sessionStorage.setItem(
         "usersOpenedChat",
