@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -33,5 +34,10 @@ class JoinChatChannelEvent implements ShouldBroadcast
     public function broadcastOn()
     {
         return new Channel('joinChat-channel');
+    }
+
+    public function broadcastWith()
+    {
+        return ['user' => $this->user, 'messages' => $this->user->messages()->latest()];
     }
 }

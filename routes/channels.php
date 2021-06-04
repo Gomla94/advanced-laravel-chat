@@ -19,6 +19,7 @@ Broadcast::channel('App.User.{id}', function ($user, $id) {
 });
 
 Broadcast::channel('joinChat-channel', function ($user) {
+    // return ['user' => $user, 'messages' => $user->messages()->latest('id')->first()];
     return $user;
 });
 

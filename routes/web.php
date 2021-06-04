@@ -24,6 +24,7 @@ Route::prefix('chat')->group(function () {
     Route::get('/create-group', 'ChatController@createGroup')->name('chatGroup.create');
     Route::get('/groups', 'ChatController@index')->name('chatGroup.index');
     Route::post('/create-group', 'ChatController@storeGroup')->name('chatGroup.store');
+    Route::get('/user-related-users-and-groups', 'ChatController@userRelatedUsersAndGroups');
 });
 
 Auth::routes();

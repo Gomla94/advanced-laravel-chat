@@ -1980,6 +1980,32 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ["authuser", "divID", "usergroups"],
@@ -1995,16 +2021,21 @@ __webpack_require__.r(__webpack_exports__);
       //the page if there was any opened chat it will be automatically opened.
 
       this.usersOpenedChatArray.forEach(function (el) {
-        _this.newChat(el.name, el.id, el.groupid);
+        _this.newChat(el.name, el.id, el.groupid, el.userimage);
       });
-    }
+    } // window.Echo.channel("joinChat-channel").listen(
+    //   "JoinChatChannelEvent",
+    //   (event) => {
+    //     this.users.push(event.user);
+    //   }
+    // );
+    // console.log(this.usergroups);
 
-    console.log(this.usergroups);
+
     this.groups = this.usergroups;
     this.groups.forEach(function (group) {
       window.Echo["private"]("group.".concat(group.id)).listen("MessageSentEvent", function (event) {
-        console.log(event);
-
+        // console.log(event);
         _this.messages.push(event.message);
 
         _this.newChat("group-".concat(group.name), undefined, event.message.group_id);
@@ -2030,8 +2061,7 @@ __webpack_require__.r(__webpack_exports__);
 
     //if there is no session created then create one and put the usersOpenedChatArray in it,
     //because we are gonna use it to automatically open the previously opened chat windows.
-    console.log(this.authuser.id);
-
+    // console.log(this.authuser.id);
     if (!sessionStorage.getItem("usersOpenedChat")) {
       sessionStorage.setItem("usersOpenedChat", JSON.stringify(this.usersOpenedChatArray));
     }
@@ -2041,39 +2071,37 @@ __webpack_require__.r(__webpack_exports__);
     //then listen to the new message event then run the newChat function.
     .here(function (user) {
       user.forEach(function (user) {
-        console.log(user.id, _this2.authuser.id);
-
+        // console.log(user.image);
         if (user.id !== _this2.authuser.id) {
           _this2.users.push(user);
 
           window.Echo["private"]("messages.".concat(user.id, ".").concat(_this2.authuser.id)).listen("MessageSentEvent", function (event) {
-            console.log("hehehehe advancedchat");
-
-            _this2.newChat(user.name, user.id);
+            // console.log("hehehehe advancedchat");
+            _this2.newChat(user.name, user.id, event.message.group_id, user.image);
           });
         }
       });
     }).joining(function (user) {
-      console.log("joined"); //if a user was newly logged in then join the unique private channel, and listen to the new message event,
+      // console.log("joined", user.image);
+      //if a user was newly logged in then join the unique private channel, and listen to the new message event,
       //then run the newChat function.
-
+      console.log("joined");
       window.Echo["private"]("messages.".concat(user.id, ".").concat(_this2.authuser.id)).listen("MessageSentEvent", function (event) {
-        console.log("hehehehe advancedchat");
-
-        _this2.newChat(user.name, user.id);
+        // console.log("hehehehe advancedchat");
+        _this2.newChat(user.name, user.id, event.message.group_id, user.image);
       });
 
       _this2.users.push(user);
     }).leaving(function (user) {
       //when a user logged out or left the web site then filter the users array,
       //the users array is automatically listed in the active users box.
+      console.log("left");
       _this2.users = _this2.users.filter(function (u) {
         return user.id != u.id;
       });
     });
     window.Echo["private"]("user.".concat(this.authuser.id)).listen("GroupCreatedEvent", function (event) {
-      console.log("group created");
-
+      // console.log("group created");
       _this2.groups.push(event.group);
     });
   },
@@ -2081,23 +2109,42 @@ __webpack_require__.r(__webpack_exports__);
     toggleOpacity: function toggleOpacity() {
       this.opacityClass = !this.opacityClass;
     },
+    minimize: function minimize(value) {
+      //this message is responsible for minimizing the chat box.
+      console.log(value);
+      var expandSpan = event.target;
+
+      if (!expandSpan.classList.contains("panel-collapsed")) {
+        $(".active-users-panel-body").slideUp();
+        expandSpan.classList.add("panel-collapsed"); // document.querySelector(`.panel-footer`).style.display = "none";
+
+        expandSpan.classList.remove("fa-minus");
+        expandSpan.classList.add("fa-chevron-up");
+      } else {
+        $(".active-users-panel-body").slideDown();
+        expandSpan.classList.remove("panel-collapsed");
+        document.querySelector(".".concat(value)).style.display = "block";
+        expandSpan.classList.remove("fa-chevron-up");
+        expandSpan.classList.add("fa-chevron-down");
+      }
+    },
     toggleChatWrapper: function toggleChatWrapper() {
       var chatWrapper = document.querySelector(".chat-wrapper");
       var activeUsersBtn = document.querySelector(".activeUsersBtn");
       var chatContainer = document.querySelector(".chat-container");
-
-      if (this.chatContainerToggledRight) {
-        this.chatContainerToggledRight = false;
-        chatContainer.style.paddingRight = "190px";
-      } else {
-        this.chatContainerToggledRight = true;
-        chatContainer.style.paddingRight = "80px";
-      }
+      chatContainer.classList.toggle("toggleChatContainer"); // if (this.chatContainerToggledRight) {
+      //   this.chatContainerToggledRight = false;
+      //   chatContainer.style.paddingRight = "190px";
+      // } else {
+      //   this.chatContainerToggledRight = true;
+      //   chatContainer.style.paddingRight = "80px";
+      // }
 
       activeUsersBtn.classList.toggle("toggleActiveUsersBtnRight");
       chatWrapper.classList.toggle("toggleDisplay");
     },
-    newChat: function newChat(name, id, groupid) {
+    newChat: function newChat(name, id, groupid, userimage) {
+      // console.log(name, id, groupid, userimage);
       this.usersOpenedChatArray = JSON.parse(sessionStorage.getItem("usersOpenedChat")); //if window chat is opened with this user then do not put a new object in the usersOpenedChatArray,
       //this is why i am checking the usersOpenedChatArray.
 
@@ -2107,14 +2154,17 @@ __webpack_require__.r(__webpack_exports__);
         var userChat = {
           id: id,
           name: name,
-          groupid: groupid
+          groupid: groupid,
+          userimage: userimage
         };
         this.usersOpenedChatArray.push(userChat);
         sessionStorage.setItem("usersOpenedChat", JSON.stringify(this.usersOpenedChatArray));
       }
 
       var componentContainers = document.querySelectorAll(".componentContainer");
-      var alreadyExistedDiv = id ? document.getElementById("componentContainer".concat(id)) : document.getElementById("componentContainer".concat(name)); //if there is a chat window existed with this user id then return false.
+      console.log("newChat"); // return false;
+
+      var alreadyExistedDiv = id ? document.getElementById("componentContainer".concat(id)) : document.getElementById("componentContainerGroup".concat(groupid)); //if there is a chat window existed with this user id then return false.
 
       if (alreadyExistedDiv) return false; //if there are 3 opened chat windows and i wanna open a fourth one,
       //then remove the first one (MAXIMUM NUMBER OF 3 OPENED CHAT WINDOW)
@@ -2127,15 +2177,15 @@ __webpack_require__.r(__webpack_exports__);
 
       var chatContainer = document.querySelector(".chat-container");
       var componentContainer = document.createElement("div");
-      var componentConntainerId;
+      var componentContainerId;
       componentContainer.classList.add("componentContainer", "chatBox");
 
       if (id !== undefined) {
-        componentConntainerId = "componentContainer".concat(id);
-        componentContainer.setAttribute("id", componentConntainerId);
+        componentContainerId = "componentContainer".concat(id);
+        componentContainer.setAttribute("id", componentContainerId);
       } else {
-        componentConntainerId = "componentContainer".concat(name);
-        componentContainer.setAttribute("id", componentConntainerId);
+        componentContainerId = "componentContainerGroup".concat(groupid);
+        componentContainer.setAttribute("id", componentContainerId);
       }
 
       var vuecomp = Vue.extend(_NewChatBoxComponent_vue__WEBPACK_IMPORTED_MODULE_0__["default"]);
@@ -2143,12 +2193,13 @@ __webpack_require__.r(__webpack_exports__);
         propsData: {
           fromUserID: this.authuser.id,
           toUserID: id,
-          panelFooter: id !== undefined ? "panel-footer-".concat(id) : "panel-footer-".concat(name),
+          panelFooter: id !== undefined ? "panel-footer-".concat(id) : "panel-footer-group-".concat(groupid),
           userName: name,
           usersOpenedChatArray: this.usersOpenedChatArray,
-          componentID: componentConntainerId,
+          componentID: componentContainerId,
           groupID: groupid,
-          authuser: this.authuser
+          authuser: this.authuser,
+          userimage: userimage ? userimage : null
         }
       }).$mount(componentContainer);
       componentContainer.append(comp.$el);
@@ -2205,14 +2256,205 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! jquery */ "./node_modules/jquery/dist/jquery.js");
 /* harmony import */ var jquery__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(jquery__WEBPACK_IMPORTED_MODULE_1__);
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2410,7 +2652,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ["chatBoxStyle", "userName", "panelFooter", "fromUserID", "toUserID", "usersOpenedChatArray", "componentID", "groupID", "authuser"],
+  props: ["chatBoxStyle", "userName", "panelFooter", "fromUserID", "toUserID", "usersOpenedChatArray", "componentID", "groupID", "authuser", "userimage", "replyMessageID", "replyingToMessage"],
   mounted: function mounted() {},
   data: function data() {
     return {
@@ -2453,77 +2695,105 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
       //get all messages between these 2 users and pass the returned messages to the messages array
       axios.get("/messages?from=".concat(from, "&to=").concat(to, "&groupid=").concat(groupid)).then(function (response) {
-        return _this2.messages = response.data;
+        _this2.messages = response.data; // console.log(response.data);
       });
     },
-    sendMessage: function sendMessage(event) {
-      var _this$messages$push;
-
-      //send a new message to the backend and push this message to the messages array,
-      //so that it appears in the chat box to the user that sent it.
-      if (this.newMessage === "") return false;
-      axios.post("/chat", {
-        message: this.newMessage,
-        fromUser: this.fromUserID,
-        toUser: this.toUserID,
-        groupID: this.groupID
-      }).then(function (resonse) {
-        return console.log(resonse.data.message);
-      });
-      var time = new Date();
-      this.messages.push((_this$messages$push = {
-        message: this.newMessage,
-        user: this.user,
-        from: this.fromUserID
-      }, _defineProperty(_this$messages$push, "user", {
-        name: this.authuser.name
-      }), _defineProperty(_this$messages$push, "created_at", time.toLocaleString("en-US", {
-        hour: "numeric",
-        minute: "numeric",
-        hour12: false
-      })), _this$messages$push));
-      this.newMessage = "";
-    },
-    sendFile: function sendFile(event) {
+    sendMessage: function sendMessage(event, passedMessage, passedToUser, passedGroupID, forwarded) {
       var _this3 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee() {
-        var _this3$messages$push;
-
-        var data, response, time;
+        var replyDiv, time, currentTime, messagesList, forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow, forwardedMessage, myForwardedMessage;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                //this method is responsible of sending attachements files to the backend.
-                data = new FormData();
-                _this3.image = event.target.files[0];
-                data.append("image", event.target.files[0]);
-                data.append("toUser", _this3.toUserID);
-                data.append("fromUser", _this3.fromUserID);
-                data.append("groupID", _this3.groupID);
-                _context.next = 8;
-                return axios.post("/chat", data);
+                replyDiv = event ? event.target.closest(".panel-footer").querySelector(".replyDiv") : null;
+                if (replyDiv) replyDiv.remove(); // console.log(passedGroupID);
+                // return false;
+                //send a new message to the backend and push this message to the messages array,
+                //so that it appears in the chat box to the user that sent it.
+                // this.newMessage = passedMessage ? passedMessage : "";
 
-              case 8:
-                response = _context.sent;
+                if (passedMessage !== undefined) {
+                  console.log("passedMessage");
+                  _this3.newMessage = passedMessage;
+                }
+
+                if (!(_this3.newMessage === "")) {
+                  _context.next = 5;
+                  break;
+                }
+
+                return _context.abrupt("return", false);
+
+              case 5:
                 time = new Date();
-
-                _this3.messages.push((_this3$messages$push = {
-                  message: _this3.newMessage,
-                  user: _this3.user,
-                  file: response.data.message.file,
-                  type: "file",
-                  from: _this3.fromUserID
-                }, _defineProperty(_this3$messages$push, "user", {
-                  name: _this3.authuser.name
-                }), _defineProperty(_this3$messages$push, "time", time.toLocaleString("en-US", {
+                currentTime = time.toLocaleString("en-US", {
                   hour: "numeric",
                   minute: "numeric",
                   hour12: true
-                })), _this3$messages$push));
+                });
+                axios.post("/chat", {
+                  message: passedMessage ? passedMessage : _this3.newMessage,
+                  fromUser: _this3.fromUserID,
+                  toUser: passedGroupID ? null : passedToUser ? passedToUser : _this3.toUserID,
+                  groupID: passedToUser ? null : passedGroupID ? passedGroupID : _this3.groupID,
+                  created_at: currentTime,
+                  replyToMessageID: _this3.replyMessageID,
+                  forwarded: forwarded !== undefined ? 1 : 0
+                }).then(function (response) {
+                  return console.log("response");
+                });
 
-              case 11:
+                if (!passedMessage) {
+                  _this3.messages.push({
+                    message: _this3.newMessage,
+                    from: _this3.fromUserID,
+                    user: {
+                      name: _this3.authuser.name
+                    },
+                    created_at: currentTime,
+                    replyingToMessage: _this3.replyingToMessage
+                  });
+                }
+
+                if (passedToUser || passedGroupID) {
+                  forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedToUser));
+                  forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroupID));
+                  console.log(forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow);
+                  messagesList = forwardToExistedUserChatWindow ? forwardToExistedChatWindow.querySelector("#panel-footer-".concat(passedToUser)) : forwardToExistedGroupChatWindow.querySelector("#panel-footer-group-".concat(passedGroupID));
+                }
+
+                if (messagesList) {
+                  console.log("found"); // const messagesList = forwardToExistedChatWindow.querySelector(
+                  //   `#panel-footer-${passedToUser}`
+                  // );
+
+                  forwardedMessage = {
+                    message: _this3.newMessage,
+                    from: _this3.fromUserID,
+                    user: {
+                      name: _this3.authuser.name
+                    },
+                    created_at: currentTime,
+                    replyingToMessage: _this3.replyingToMessage
+                  };
+                  myForwardedMessage = document.createElement("li");
+                  myForwardedMessage.style.marginLeft = "-20px"; // myForwardedMessage.style.width = "380px";
+
+                  myForwardedMessage.style.marginTop = "10px";
+                  myForwardedMessage.innerHTML = "\n            <div class=\"col-md-10 col-xs-10\">\n              <div class=\"messages msg_receive appendForwardedMessage\">\n                <div class=\"messages msg_receive\" style=\"background-color: grey; opacity: 0.3; height: 30px; width: 100%;\">\n                  <i class=\"fas fa-arrow-right\"><span style=\"font-family:Nunito\"></span></i>\n                  forwarded\n                </div>\n                <p class=\"message\" style=\"overflow-wrap: break-word;margin-bottom:4px\">\n                    <strong>".concat(forwardedMessage.user.name, ": </strong>").concat(forwardedMessage.message, "\n                </p>\n                <time style=\"color:black;font-size:11px\">").concat(forwardedMessage.created_at, "</time>\n              </div>\n            </div>\n        ");
+                  messagesList.append(myForwardedMessage);
+                } // console.log(this.messages);
+                // console.log(this.newMessage);
+
+
+                _this3.newMessage = "";
+                _this3.replyingToMessage = null;
+                _this3.replyMessageID = null;
+                _this3.groupID = null;
+
+              case 15:
               case "end":
                 return _context.stop();
             }
@@ -2531,56 +2801,100 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
         }, _callee);
       }))();
     },
-    sendImage: function sendImage(event) {
+    sendFile: function sendFile(event, passedImage, passedUser, passedType, passedGroup, forwarded) {
       var _this4 = this;
 
       return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee2() {
-        var _this4$messages$push;
+        var replyDiv, time, currentTime, data, response, _this4$messages$push, messagesList, forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow, _forwardedMessage, forwardedMessage, myForwardedMessage;
 
-        var data, response, time;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                //this method is responsible of sending images to the backend.
-                data = new FormData();
-                _this4.image = event.target.files[0];
+                // console.log(forwarded);
+                // return false;
+                //this method is responsible of sending attachements files to the backend.
+                replyDiv = event ? event.target.closest(".panel-footer").querySelector(".replyDiv") : null;
+                console.log(passedGroup, passedUser, _this4.toUserID); // return false;
 
-                if (!(_this4.image.size > 20048)) {
-                  _context2.next = 5;
-                  break;
-                }
-
-                alert("Max image size is 2MB");
-                return _context2.abrupt("return", false);
-
-              case 5:
-                data.append("image", event.target.files[0]);
-                data.append("toUser", _this4.toUserID);
-                data.append("fromUser", _this4.fromUserID);
-                data.append("groupID", _this4.groupID);
-                _context2.next = 11;
-                return axios.post("/chat", data);
-
-              case 11:
-                response = _context2.sent;
+                if (replyDiv) replyDiv.remove();
                 time = new Date();
-
-                _this4.messages.push((_this4$messages$push = {
-                  message: _this4.newMessage,
-                  user: _this4.user,
-                  file: response.data.message.file,
-                  type: "image",
-                  from: _this4.fromUserID
-                }, _defineProperty(_this4$messages$push, "user", {
-                  name: _this4.authuser.name
-                }), _defineProperty(_this4$messages$push, "time", time.toLocaleString("en-US", {
+                currentTime = time.toLocaleString("en-US", {
                   hour: "numeric",
                   minute: "numeric",
                   hour12: true
-                })), _this4$messages$push));
+                });
+                data = new FormData();
+                _this4.image = event ? event.target.files[0] : null;
+                data.append("image", event ? event.target.files[0] : null);
+                data.append("toUser", passedGroup !== undefined ? null : passedUser !== undefined ? passedUser : _this4.toUserID);
+                data.append("fromUser", _this4.fromUserID);
+                data.append("type", passedType);
+                data.append("file", passedImage);
+                data.append("forwarded", forwarded !== undefined ? 1 : 0);
+                data.append("created_at", currentTime);
 
-              case 14:
+                if (_this4.replyMessageID) {
+                  data.append("replyToMessageID", _this4.replyMessageID);
+                }
+
+                data.append("groupID", passedUser ? null : passedGroup ? passedGroup : _this4.groupID); // return false;
+
+                console.log(data); // return false;
+
+                _context2.next = 19;
+                return axios.post("/chat", data);
+
+              case 19:
+                response = _context2.sent;
+                console.log(response.data.message); // return false;
+
+                if (!passedImage) {
+                  _this4.messages.push((_this4$messages$push = {
+                    id: response.data.message.id,
+                    message: _this4.newMessage,
+                    user: _this4.user,
+                    file: response.data.message.file,
+                    type: "file",
+                    from: _this4.fromUserID
+                  }, _defineProperty(_this4$messages$push, "user", {
+                    name: _this4.authuser.name
+                  }), _defineProperty(_this4$messages$push, "time", currentTime), _defineProperty(_this4$messages$push, "replyingMessageID", _this4.replyMessageID), _defineProperty(_this4$messages$push, "replyingToMessage", _this4.replyingToMessage), _this4$messages$push));
+                }
+
+                if (passedUser || passedGroup) {
+                  forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedUser));
+                  forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroup));
+                  console.log(forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow);
+                  messagesList = forwardToExistedUserChatWindow ? forwardToExistedChatWindow.querySelector("#panel-footer-".concat(passedUser)) : forwardToExistedGroupChatWindow.querySelector("#panel-footer-group-".concat(passedGroup));
+                }
+
+                if (messagesList) {
+                  forwardedMessage = (_forwardedMessage = {
+                    id: response.data.message.id,
+                    message: _this4.newMessage,
+                    user: _this4.user,
+                    file: response.data.message.file,
+                    type: "image",
+                    from: _this4.fromUserID
+                  }, _defineProperty(_forwardedMessage, "user", {
+                    name: _this4.authuser.name
+                  }), _defineProperty(_forwardedMessage, "created_at", currentTime), _defineProperty(_forwardedMessage, "replyingMessageID", _this4.replyMessageID), _defineProperty(_forwardedMessage, "replyingToMessage", _this4.replyingToMessage), _forwardedMessage);
+                  myForwardedMessage = document.createElement("li");
+                  myForwardedMessage.style.marginLeft = "-20px"; // myForwardedMessage.style.width = "380px";
+
+                  myForwardedMessage.style.marginTop = "10px";
+                  myForwardedMessage.innerHTML = "\n            <div class=\"col-md-10 col-xs-10\">\n              <div class=\"messages msg_receive appendForwardedMessage\">\n                <div class=\"messages msg_receive\" style=\"background-color: grey; opacity: 0.3; height: 30px; width: 100%;\">\n                  <i class=\"fas fa-arrow-right\"><span style=\"margin-left:4px;font-family:Nunito\">forwarded</span></i>\n                </div>\n                <p class=\"message\" style=\"overflow-wrap: break-word;margin-bottom:4px\">\n                    <strong>".concat(forwardedMessage.user.name, ": </strong>\n                </p>\n                <time style=\"color:black;font-size:11px\">").concat(forwardedMessage.created_at, "</time>\n\n                <a href=\"/chat/").concat(forwardedMessage.file, "\" download style=\"cursor:pointer;color:black\">\n                <i class=\"fas fa-paperclip\"\"></i>\n                </a>\n              </div>\n            </div>\n        ");
+                  messagesList.append(myForwardedMessage);
+                }
+
+                _this4.newMessage = null;
+                _this4.replyingToMessage = null;
+                _this4.replyMessageID = null;
+                _this4.groupID = null;
+                if (event) event.target.value = "";
+
+              case 29:
               case "end":
                 return _context2.stop();
             }
@@ -2588,30 +2902,155 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
         }, _callee2);
       }))();
     },
-    startRecording: function startRecording(event) {
+    sendImage: function sendImage(event, passedImage, passedUser, passedType, passedGroup, forwarded) {
       var _this5 = this;
+
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee3() {
+        var replyDiv, time, currentTime, data, response, _this5$messages$push, forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow, messagesList, _forwardToExistedUserChatWindow, _forwardToExistedGroupChatWindow, forwardedMessage, myForwardedMessage;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                //this method is responsible of sending images to the backend.
+                console.log("forward image");
+                console.log(passedGroup); // return false;
+
+                replyDiv = event ? event.target.closest(".panel-footer").querySelector(".replyDiv") : null;
+                if (replyDiv) replyDiv.remove();
+                time = new Date();
+                currentTime = time.toLocaleString("en-US", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true
+                });
+                data = new FormData();
+
+                if (!(event !== null)) {
+                  _context3.next = 12;
+                  break;
+                }
+
+                _this5.image = event.target.files[0];
+
+                if (!(_this5.image.size > 20048)) {
+                  _context3.next = 12;
+                  break;
+                }
+
+                alert("Max image size is 2MB");
+                return _context3.abrupt("return", false);
+
+              case 12:
+                console.log(passedUser, passedGroup, _this5.toUserID); // return false;
+
+                data.append("image", event !== null ? event.target.files[0] : null);
+                data.append("file", passedImage);
+                data.append("toUser", passedGroup ? null : passedUser ? passedUser : _this5.toUserID);
+                data.append("type", passedType ? passedType : null);
+                data.append("fromUser", _this5.fromUserID);
+                data.append("created_at", currentTime);
+                data.append("forwarded", forwarded !== undefined ? 1 : 0);
+
+                if (_this5.replyMessageID) {
+                  data.append("replyToMessageID", _this5.replyMessageID);
+                }
+
+                data.append("groupID", passedUser ? null : passedGroup ? passedGroup : _this5.groupID);
+                _context3.next = 24;
+                return axios.post("/chat", data);
+
+              case 24:
+                response = _context3.sent;
+
+                // return false;
+                if (!passedImage) {
+                  _this5.messages.push((_this5$messages$push = {
+                    id: response.data.message.id,
+                    message: _this5.newMessage,
+                    user: _this5.user,
+                    file: response.data.message.file,
+                    type: "image",
+                    from: _this5.fromUserID
+                  }, _defineProperty(_this5$messages$push, "user", {
+                    name: _this5.authuser.name
+                  }), _defineProperty(_this5$messages$push, "time", currentTime), _defineProperty(_this5$messages$push, "replyingMessageID", _this5.replyMessageID), _defineProperty(_this5$messages$push, "replyingToMessage", _this5.replyingToMessage), _this5$messages$push));
+                }
+
+                forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedUser));
+                forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroup));
+                console.log(forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow);
+
+                if (passedUser || passedGroup) {
+                  console.log("passedMessage");
+                  _forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedUser));
+                  _forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroup));
+                  console.log(_forwardToExistedUserChatWindow, _forwardToExistedGroupChatWindow);
+                  messagesList = _forwardToExistedUserChatWindow ? forwardToExistedChatWindow.querySelector("#panel-footer-".concat(passedUser)) : _forwardToExistedGroupChatWindow.querySelector("#panel-footer-group-".concat(passedGroup));
+                }
+
+                if (messagesList) {
+                  console.log("messageList"); // const messagesList = forwardToExistedChatWindow.querySelector(
+                  //   `#panel-footer-${passedUser}`
+                  // );
+
+                  forwardedMessage = {
+                    message: _this5.newMessage,
+                    from: _this5.fromUserID,
+                    file: response.data.message.file,
+                    type: "image",
+                    user: {
+                      name: _this5.authuser.name
+                    },
+                    created_at: currentTime,
+                    replyingToMessage: _this5.replyingToMessage
+                  };
+                  myForwardedMessage = document.createElement("li");
+                  myForwardedMessage.style.marginLeft = "-20px"; // myForwardedMessage.style.width = "380px";
+
+                  myForwardedMessage.style.marginTop = "10px";
+                  myForwardedMessage.innerHTML = "\n            <div class=\"col-md-10 col-xs-10\">\n              <div class=\"messages msg_receive appendForwardedMessage\">\n                <div class=\"messages msg_receive\" style=\"background-color: grey; opacity: 0.3; height: 30px; width: 100%;\">\n                  <i class=\"fas fa-arrow-right\"><span style=\"margin-left:4px;font-family:Nunito\">forwarded</span></i>\n                </div>\n                <p class=\"message\" style=\"overflow-wrap: break-word;margin-bottom:4px\">\n                    <strong>".concat(forwardedMessage.user.name, ": </strong>\n                </p>\n                <time style=\"color:black;font-size:11px;position:absolute\">").concat(forwardedMessage.created_at, "</time>\n                <img src=\"/chat/").concat(forwardedMessage.file, "\" class=\"appendForwardedImage\">\n              </div>\n            </div>\n        ");
+                  messagesList.append(myForwardedMessage);
+                }
+
+                _this5.newMessage = null;
+                _this5.replyingToMessage = null;
+                _this5.replyMessageID = null;
+                _this5.groupID = null;
+                if (event) event.target.value = "";
+
+              case 36:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }))();
+    },
+    startRecording: function startRecording(event) {
+      var _this6 = this;
 
       var audioContext = new AudioContext();
       var recordingBtn = event.target;
       var stopRecordingBtn = recordingBtn.nextElementSibling;
-      stopRecordingBtn.style.marginLeft = "100px";
-      stopRecordingBtn.style.display = "block";
-      recordingBtn.style.display = "none";
       navigator.mediaDevices.getUserMedia({
         audio: true
       }).then(function (stream) {
         console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
+        stopRecordingBtn.style.marginLeft = "100px";
+        recordingBtn.classList.toggle("hideBtn");
+        stopRecordingBtn.classList.toggle("hideBtn");
         /* assign to gumStream for later use */
         // audioStream = stream;
 
         /* use the stream */
 
-        _this5.input = audioContext.createMediaStreamSource(stream);
+        _this6.input = audioContext.createMediaStreamSource(stream);
         /* Create the Recorder object and configure to record mono sound (1 channel) Recording 2 channels will double the file size */
 
-        _this5.recorder = new Recorder(_this5.input); // //start the recording process
+        _this6.recorder = new Recorder(_this6.input); // //start the recording process
 
-        _this5.recorder.record();
+        _this6.recorder.record();
 
         console.log("Recording started");
       })["catch"](function (err) {
@@ -2620,49 +3059,134 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       });
     },
     stopRecording: function stopRecording(event) {
+      var replyDiv = event.target.closest(".panel-footer").querySelector(".replyDiv");
+      if (replyDiv) replyDiv.remove();
       this.recorder.stop();
       var stopRecordingBtn = event.target;
-      var startRecordingBtn = document.querySelector(".fa-microphone");
+      var startRecordingBtn = stopRecordingBtn.previousElementSibling;
+      console.log(startRecordingBtn);
       startRecordingBtn.style.marginLeft = "100px";
-      startRecordingBtn.style.display = "block";
-      stopRecordingBtn.style.display = "none";
+      startRecordingBtn.classList.toggle("hideBtn");
+      stopRecordingBtn.classList.toggle("hideBtn");
       this.recorder.exportWAV(this.createDownloadLink);
     },
     createDownloadLink: function createDownloadLink(blob) {
-      var _this6 = this;
+      var _this7 = this;
 
-      console.log(blob);
-      var formdata = new FormData();
-      formdata.append("image", blob);
-      formdata.append("toUser", this.toUserID);
-      formdata.append("fromUser", this.fromUserID);
-      formdata.append("groupID", this.groupID);
-      axios.post("/chat", formdata).then(function (response) {
-        var _this6$messages$push;
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee4() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                _this7.sendVoice(blob);
 
-        console.log(response);
-        var time = new Date();
+              case 1:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }))();
+    },
+    sendVoice: function sendVoice(blob, passedVoice, passedUser, passedType, passedGroup, forwarded) {
+      var _this8 = this;
 
-        _this6.messages.push((_this6$messages$push = {
-          message: _this6.newMessage,
-          user: _this6.user,
-          file: response.data.message.file,
-          type: "audio",
-          from: _this6.fromUserID
-        }, _defineProperty(_this6$messages$push, "user", {
-          name: _this6.authuser.name
-        }), _defineProperty(_this6$messages$push, "time", time.toLocaleString("en-US", {
-          hour: "numeric",
-          minute: "numeric",
-          hour12: true
-        })), _this6$messages$push));
-      });
+      return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee5() {
+        var time, currentTime, formdata, response, _this8$messages$push, messagesList, forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow, _forwardedMessage2, forwardedMessage, myForwardedMessage;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                console.log("forward voice");
+                console.log(passedUser, passedGroup); // return false;
+
+                time = new Date();
+                currentTime = time.toLocaleString("en-US", {
+                  hour: "numeric",
+                  minute: "numeric",
+                  hour12: true
+                });
+                formdata = new FormData();
+                formdata.append("image", blob !== null ? blob : null);
+                formdata.append("file", passedVoice);
+                formdata.append("toUser", passedUser ? passedUser : _this8.toUserID);
+                formdata.append("fromUser", _this8.fromUserID);
+                formdata.append("type", passedType ? passedType : null);
+                formdata.append("created_at", currentTime);
+                formdata.append("forwarded", forwarded !== undefined ? 1 : 0);
+
+                if (_this8.replyMessageID) {
+                  formdata.append("replyToMessageID", _this8.replyMessageID);
+                }
+
+                formdata.append("groupID", passedUser ? null : passedGroup ? passedGroup : _this8.groupID);
+                _context5.next = 16;
+                return axios.post("/chat", formdata);
+
+              case 16:
+                response = _context5.sent;
+                console.log(response);
+
+                if (!passedVoice) {
+                  _this8.messages.push((_this8$messages$push = {
+                    id: response.data.message.id,
+                    message: _this8.newMessage,
+                    user: _this8.user,
+                    file: response.data.message.file,
+                    type: "audio",
+                    from: _this8.fromUserID
+                  }, _defineProperty(_this8$messages$push, "user", {
+                    name: _this8.authuser.name
+                  }), _defineProperty(_this8$messages$push, "time", currentTime), _defineProperty(_this8$messages$push, "replyingMessageID", _this8.replyMessageID), _defineProperty(_this8$messages$push, "replyingToMessage", _this8.replyingToMessage), _this8$messages$push));
+                }
+
+                if (passedUser || passedGroup) {
+                  forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedUser));
+                  forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroup));
+                  console.log(forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow);
+                  messagesList = forwardToExistedUserChatWindow ? forwardToExistedChatWindow.querySelector("#panel-footer-".concat(passedUser)) : forwardToExistedGroupChatWindow.querySelector("#panel-footer-group-".concat(passedGroup));
+                }
+
+                if (messagesList) {
+                  console.log("audio message list");
+                  forwardedMessage = (_forwardedMessage2 = {
+                    id: response.data.message.id,
+                    message: _this8.newMessage,
+                    user: _this8.user,
+                    file: response.data.message.file,
+                    type: "image",
+                    from: _this8.fromUserID
+                  }, _defineProperty(_forwardedMessage2, "user", {
+                    name: _this8.authuser.name
+                  }), _defineProperty(_forwardedMessage2, "created_at", currentTime), _defineProperty(_forwardedMessage2, "replyingMessageID", _this8.replyMessageID), _defineProperty(_forwardedMessage2, "replyingToMessage", _this8.replyingToMessage), _forwardedMessage2);
+                  myForwardedMessage = document.createElement("li");
+                  myForwardedMessage.style.marginLeft = "-20px"; // myForwardedMessage.style.width = "380px";
+
+                  myForwardedMessage.style.marginTop = "10px";
+                  myForwardedMessage.innerHTML = "\n            <div class=\"col-md-10 col-xs-10\">\n              <div class=\"messages msg_receive appendForwardedMessage\">\n                <div class=\"messages msg_receive\" style=\"background-color: grey; opacity: 0.3; height: 30px; width: 100%;\">\n                  <i class=\"fas fa-arrow-right\"><span style=\"margin-left:4px;font-family:Nunito\">forwarded</span></i>\n                </div>\n                <p class=\"message\" style=\"overflow-wrap: break-word;margin-bottom:4px\">\n                    <strong>".concat(forwardedMessage.user.name, ": </strong>\n                </p>\n                <time style=\"color:black;font-size:11px\">").concat(forwardedMessage.created_at, "</time>\n\n                <audio controls style=\"width:-webkit-fill-available\" src=\"/chat/").concat(forwardedMessage.file, "\">\n              </div>\n            </div>\n        ");
+                  messagesList.append(myForwardedMessage);
+                }
+
+                _this8.replyingToMessage = null;
+                _this8.replyMessageID = null;
+                _this8.groupID = null;
+
+              case 24:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5);
+      }))();
     },
     minimize: function minimize(value) {
-      //this message is responsible for minimizing the chat box.
+      console.log(value); //this message is responsible for minimizing the chat box.
+
       var expandSpan = event.target;
 
       if (!expandSpan.classList.contains("panel-collapsed")) {
+        console.log("if", value);
         jquery__WEBPACK_IMPORTED_MODULE_1___default()("#".concat(value)).slideUp();
         expandSpan.classList.add("panel-collapsed");
         document.querySelector(".panel-footer").classList.add("panel-collapsed");
@@ -2670,6 +3194,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
         expandSpan.classList.remove("fa-minus");
         expandSpan.classList.add("fa-plus");
       } else {
+        console.log("else", value);
         jquery__WEBPACK_IMPORTED_MODULE_1___default()("#".concat(value)).slideDown();
         expandSpan.classList.remove("panel-collapsed");
         document.querySelector(".".concat(value)).style.display = "block";
@@ -2693,6 +3218,190 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
       sessionStorage.setItem("usersOpenedChat", JSON.stringify(previouslyOpenedUsersChats));
       document.getElementById("".concat(divClass)).remove();
+    },
+    messageReply: function messageReply(event, messageid) {
+      // console.log(messageid);
+      var replyBtn = event.target;
+      var chatBoxFooter = replyBtn.closest(".panel").querySelector(".panel-footer");
+      var messageDiv = replyBtn.closest(".msg_sent");
+      var existedReplyDiv = messageDiv.querySelector(".messageReply");
+      var existedForwardDiv = messageDiv.querySelector(".forwarded");
+      console.log(messageDiv, existedReplyDiv, existedForwardDiv); // return false;
+
+      var appendreplyingDiv;
+      var existedMessageImage = replyBtn.closest(".col-md-10").querySelector(".messageImage");
+      var existedMessageAudio = replyBtn.closest(".col-md-10").querySelector(".messageAudio");
+      var existedMessageAttachment = replyBtn.closest(".col-md-10").querySelector(".messageAttachment"); // console.log(existedMessageAudio);
+
+      if (existedReplyDiv && existedForwardDiv) {
+        console.log("contains reply and forwarded");
+        this.replyingToMessage = {
+          message: existedForwardDiv.nextElementSibling.textContent.trim().split(" ").splice(1).join(" "),
+          user: {
+            name: existedForwardDiv.nextElementSibling.textContent.trim().split(" ")[0].replace(":", "")
+          },
+          file: existedMessageImage ? existedMessageImage.getAttribute("src").split("").splice(6).join("") : null,
+          type: existedMessageAudio ? "audio" : existedMessageImage ? "image" : existedMessageAttachment ? "file" : null
+        };
+        appendreplyingDiv = messageDiv.querySelector(".messageText").textContent;
+        console.log(appendreplyingDiv);
+      } else {
+        console.log("no reply");
+        console.log(messageDiv.querySelector(".messageText")); // return false;
+
+        this.replyingToMessage = {
+          message: messageDiv.querySelector(".messageText").textContent.trim().split(" ").splice(1).join(" "),
+          user: {
+            name: messageDiv.querySelector(".messageText").textContent.split(" ")[0].replace(":", "")
+          },
+          file: existedMessageImage ? existedMessageImage.getAttribute("src").split("").splice(6).join("") : null,
+          type: existedMessageAudio ? "audio" : existedMessageImage ? "image" : existedMessageAttachment ? "file" : null
+        };
+        appendreplyingDiv = messageDiv.querySelector(".messageText").textContent;
+      }
+
+      this.replyMessageID = messageid;
+      console.log(appendreplyingDiv); // return false;
+
+      this.appendReply(replyBtn, appendreplyingDiv, chatBoxFooter, existedMessageImage, existedMessageAudio, existedMessageAttachment); // return false;
+      // console.log(this.replyMessageID);
+    },
+    appendReply: function appendReply(replyBtn, appendreplyingDiv, chatBoxFooter) {
+      var existedMessageImage = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+      var existedMessageAudio = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : null;
+      var existedMessageAttachment = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : null;
+      var existedReplyDiv = chatBoxFooter.querySelector(".replyDiv");
+      if (existedReplyDiv) existedReplyDiv.remove();
+      var imageSrc = null;
+
+      if (existedMessageImage) {
+        imageSrc = replyBtn.closest(".row").querySelector(".messageImage").getAttribute("src");
+      } // return false;
+
+
+      var replyingDiv = document.createElement("div");
+      replyingDiv.classList.add("replyDiv");
+      replyingDiv.style.backgroundColor = "silver";
+      replyingDiv.style.borderLeft = "3px solid red";
+
+      if (imageSrc) {
+        replyingDiv.innerHTML = "".concat(appendreplyingDiv, "<img src=\"").concat(imageSrc, "\" class=\"replyMessageImage\" height=50px;width=50px/>");
+      } else if (existedMessageAudio) {
+        replyingDiv.innerHTML = "<p style=word-break:break-word>".concat(appendreplyingDiv.split(" ").slice(0, 1).join(""), " <i class=\"fas fa-microphone\"></i></p>");
+      } else if (existedMessageAttachment) {
+        console.log("attachment");
+        replyingDiv.innerHTML = "<p style=word-break:break-word>".concat(appendreplyingDiv.split(" ").slice(0, 1).join(""), " <i class=\"fas fa-paperclip\"></i></p>");
+      } else {
+        replyingDiv.innerHTML = "<p style=word-break:break-word>".concat(appendreplyingDiv, "</p>");
+      }
+
+      replyingDiv.style.height = "auto";
+      replyingDiv.style.width = "auto";
+      replyingDiv.style.justifyContent = "start";
+      replyingDiv.style.display = "flex";
+      replyingDiv.style.borderRadius = "3px";
+      replyingDiv.style.padding = "5px";
+      var closeReply = document.createElement("i");
+      closeReply.classList.add("fas", "fa-times");
+      closeReply.style.cursor = "pointer";
+      closeReply.style.marginLeft = "auto";
+      closeReply.addEventListener("click", this.removeReply);
+      replyingDiv.append(closeReply);
+      chatBoxFooter.prepend(replyingDiv);
+    },
+    removeReply: function removeReply() {
+      event.target.closest(".replyDiv").remove();
+      event.target.removeEventListener("click", this.removeReply);
+      this.replyMessageID = null;
+      this.replyingToMessage = null;
+    },
+    getUserRelatedUsersAnGroups: function getUserRelatedUsersAnGroups(event, message) {
+      var _this9 = this;
+
+      var alreadyExistedModal = document.querySelector(".modal");
+      if (alreadyExistedModal) alreadyExistedModal.remove();
+      axios.get("/chat/user-related-users-and-groups", {
+        params: {
+          user_id: message.from
+        }
+      }).then(function (response) {
+        _this9.createForwardMessageModal(response.data.users, response.data.groups, message);
+      });
+    },
+    createForwardMessageModal: function createForwardMessageModal(users, groups, message) {
+      var _this10 = this;
+
+      var modal = document.createElement("div");
+      modal.classList.add("modal");
+      modal.setAttribute("tabindex", "-1");
+      modal.setAttribute("role", "dialog");
+      modal.innerHTML = "\n          <div class=\"modal-dialog\" role=\"document\">\n            <div class=\"modal-content\">\n              <div class=\"modal-header\">\n                <h5 class=\"modal-title\">Forward Message</h5>\n                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">\n                  <span aria-hidden=\"true\">&times;</span>\n                </button>\n              </div>\n              <div class=\"modal-body forwardUsers\" style=\"height:150px; overflow-y:scroll\">\n              </div>\n              <div class=\"modal-body forwardGroups\" style=\"max-height:150px; overflow-y:scroll\">\n                <p><i class=\"fas fa-users\" style=\"font-size:30px\"></i></p>\n              </div>\n              <div class=\"modal-footer\">\n                <button type=\"button\" class=\"btn btn-primary\">Save changes</button>\n                <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Close</button>\n              </div>\n            </div>\n          </div>\n      ";
+      document.body.appendChild(modal);
+      jquery__WEBPACK_IMPORTED_MODULE_1___default()(".modal").modal("show");
+      var forwardUsersElement = document.querySelector(".forwardUsers");
+      users.forEach(function (user) {
+        user.image = user.image == null ? "avatar.png" : user.image;
+        var userDiv = document.createElement("div");
+        var forwardBtn = document.createElement("button");
+        forwardBtn.classList.add("btn", "btn-primary", "btn-sm");
+        forwardBtn.innerText = "Forward";
+        forwardBtn.style["float"] = "right";
+        forwardBtn.dataset["userid"] = user.id;
+        forwardBtn.dataset["message"] = JSON.stringify(message);
+        forwardBtn.addEventListener("click", _this10.forward);
+        userDiv.classList.add("forwardUserDiv");
+        userDiv.style.marginBottom = "10px";
+        var userImage = document.createElement("img");
+        userImage.setAttribute("height", "30px");
+        userImage.setAttribute("width", "30px");
+        userImage.style.marginRight = "5px";
+        userImage.src = "/images/".concat(user.image);
+        userDiv.append(userImage);
+        userDiv.append(user.name);
+        userDiv.append(forwardBtn);
+        forwardUsersElement.append(userDiv);
+      });
+      groups.forEach(function (group) {
+        var forwardGroupsElement = document.querySelector(".forwardGroups");
+        var forwardBtn = document.createElement("button");
+        forwardBtn.classList.add("btn", "btn-primary", "btn-sm");
+        forwardBtn.innerText = "Forward";
+        forwardBtn.style["float"] = "right";
+        forwardBtn.dataset["groupid"] = JSON.stringify(group.id);
+        forwardBtn.dataset["message"] = JSON.stringify(message);
+        forwardBtn.addEventListener("click", _this10.forward);
+        var groupDiv = document.createElement("div");
+        groupDiv.classList.add("forwardGroupDiv");
+        groupDiv.style.marginBottom = "10px";
+        groupDiv.append(group.name);
+        groupDiv.append(forwardBtn);
+        forwardGroupsElement.append(groupDiv);
+      });
+    },
+    forward: function forward(event) {
+      var userId = event.target.dataset["userid"];
+      var message = JSON.parse(event.target.dataset["message"]);
+      var groupid = event.target.dataset["groupid"]; // console.log(message);
+      // return false;
+
+      if (message.message !== null) {
+        this.sendMessage(null, message.message, userId, groupid, true);
+      }
+
+      if (message.type == "image") {
+        this.sendImage(null, message.file, groupid ? null : userId, "image", userId ? null : groupid, true);
+      }
+
+      if (message.type == "file") {
+        this.sendFile(null, message.file, groupid ? null : userId, "file", userId ? null : groupid, true);
+      }
+
+      if (message.type == "audio") {
+        this.sendVoice(null, message.file, groupid ? null : userId, "audio", userId ? null : groupid, true);
+      }
+
+      document.querySelector(".modal").remove();
+      document.querySelector(".modal-backdrop").remove();
     }
   }
 });
@@ -7153,7 +7862,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\nbody[data-v-0d3e177c] {\n  background-color: #eee;\n}\n[data-v-0d3e177c]::-webkit-scrollbar {\n  width: 10px;\n}\n\n/* Track */\n[data-v-0d3e177c]::-webkit-scrollbar-track {\n  box-shadow: inset 0 0 5px grey;\n  border-radius: 10px;\n}\n\n/* Handle */\n[data-v-0d3e177c]::-webkit-scrollbar-thumb {\n  background: blue;\n  border-radius: 10px;\n}\n\n/* Handle on hover */\n[data-v-0d3e177c]::-webkit-scrollbar-thumb:hover {\n  background: #b30000;\n}\n.toggleOpacityClass[data-v-0d3e177c] {\n  opacity: 1 !important;\n}\n.toggleDisplay[data-v-0d3e177c] {\n  display: none;\n}\n.toggleActiveUsersBtnRight[data-v-0d3e177c] {\n  position: fixed;\n  bottom: 15px;\n}\n.chat-btn[data-v-0d3e177c] {\n  position: fixed;\n  right: 14px;\n  cursor: pointer;\n  width: 50px;\n  height: 50px;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  border-radius: 50px;\n  background-color: blue;\n  color: #fff;\n  font-size: 22px;\n  border: none;\n  z-index: 10;\n}\n.chat-btn .close[data-v-0d3e177c] {\n  display: none;\n}\n.chat-btn i[data-v-0d3e177c] {\n  transition: all 0.9s ease;\n}\n#check:checked ~ .chat-btn i[data-v-0d3e177c] {\n  display: block;\n  pointer-events: auto;\n  /* transform: rotate(180deg) */\n}\n#check:checked ~ .chat-btn .fa-commenting[data-v-0d3e177c] {\n  display: none;\n}\n.chat-btn i[data-v-0d3e177c] {\n  font-size: 22px;\n  color: #fff !important;\n}\n#check:checked ~ .chat-wrapper[data-v-0d3e177c] {\n  opacity: 1;\n}\n.header[data-v-0d3e177c] {\n  padding: 13px;\n  background-color: blue;\n  border-radius: 5px 5px 0px 0px;\n  margin-bottom: 10px;\n  color: #fff;\n}\n.chat-form[data-v-0d3e177c] {\n  padding: 15px;\n}\n.chat-form input[data-v-0d3e177c],\ntextarea[data-v-0d3e177c],\nbutton[data-v-0d3e177c] {\n  margin-bottom: 10px;\n}\n.chat-form textarea[data-v-0d3e177c] {\n  resize: none;\n}\n.form-control[data-v-0d3e177c]:focus,\n.btn[data-v-0d3e177c]:focus {\n  box-shadow: none;\n}\n.btn[data-v-0d3e177c],\n.btn[data-v-0d3e177c]:focus,\n.btn[data-v-0d3e177c]:hover {\n  background-color: blue;\n  border: blue;\n}\n#check[data-v-0d3e177c] {\n  display: none !important;\n}\n", ""]);
+exports.push([module.i, "\n.col-md-2[data-v-0d3e177c],\n.col-md-10[data-v-0d3e177c] {\n  padding: 0;\n}\n.col-xs-4[data-v-0d3e177c] {\n  left: 30px;\n}\n.panel[data-v-0d3e177c] {\n  margin-bottom: 0px;\n}\n.chat-container[data-v-0d3e177c] {\n  position: fixed;\n  /* right: 20px; */\n  padding-right: 340px;\n  bottom: 0px;\n  width: 100%;\n  z-index: 10;\n  display: flex;\n  align-items: flex-end;\n  justify-content: flex-end;\n}\n.toggleChatContainer[data-v-0d3e177c] {\n  padding-right: 120px !important;\n}\n.panel-footer[data-v-0d3e177c] {\n  padding: 10px 15px;\n  background-color: #f5f5f5;\n  border-top: 1px solid #ddd;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.activeUsersBtn[data-v-0d3e177c] {\n  height: 50px;\n  width: 55px;\n  background-color: white;\n  margin-right: 50px;\n  border-radius: 50%;\n  display: flex;\n  align-items: center;\n  box-shadow: 0px 7px 30px silver;\n}\n.toggleDisplay[data-v-0d3e177c] {\n  display: none;\n}\n.toggleActiveUsersBtnRight[data-v-0d3e177c] {\n  position: fixed;\n  bottom: 15px;\n}\n.panel-title[data-v-0d3e177c] {\n  font-size: 16px;\n  margin-bottom: 0;\n}\n.hideBtn[data-v-0d3e177c] {\n  display: none;\n}\n.btn-chat[data-v-0d3e177c] {\n  height: 100%;\n}\n.chat-window[data-v-0d3e177c] {\n  bottom: 0;\n  position: fixed;\n  /* float:right;\n    margin-left:10px; */\n  margin-right: 2px;\n  width: 300px;\n  right: 20px;\n  z-index: 10;\n  box-shadow: 2px 2px 15px 1px grey !important;\n}\n.messageImage[data-v-0d3e177c] {\n  height: 150px;\n  width: 150px;\n}\n.chat-window > div > .panel[data-v-0d3e177c] {\n  border-radius: 5px 5px 0 0;\n}\n.icon_minim[data-v-0d3e177c] {\n  padding: 2px 10px;\n}\n.msg_container_base[data-v-0d3e177c] {\n  margin: 0;\n  padding: 0 10px 10px;\n  overflow-x: hidden;\n}\n.active-users-top-bar[data-v-0d3e177c] {\n  color: black;\n  padding: 10px;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  justify-content: space-between;\n}\n.msg_receive[data-v-0d3e177c] {\n  padding-left: 0;\n  margin-left: 0;\n}\n.msg_sent[data-v-0d3e177c] {\n  padding-bottom: 20px !important;\n  margin-right: 0;\n}\n.messages[data-v-0d3e177c] {\n  background: white;\n  padding: 10px;\n  border-radius: 2px;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  max-width: 100%;\n}\n.messages > p[data-v-0d3e177c] {\n  font-size: 13px;\n  margin: 0 0 0.2rem 0;\n}\n.messages > time[data-v-0d3e177c] {\n  font-size: 11px;\n  color: #ccc;\n}\n.msg_container[data-v-0d3e177c] {\n  padding: 10px;\n  overflow: hidden;\n  display: flex;\n}\nimg[data-v-0d3e177c] {\n  display: block;\n  width: 100%;\n}\n.avatar[data-v-0d3e177c] {\n  position: relative;\n}\n.base_receive > .avatar[data-v-0d3e177c]:after {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid #fff;\n  border-left-color: rgba(0, 0, 0, 0);\n  border-bottom-color: rgba(0, 0, 0, 0);\n}\n.base_sent[data-v-0d3e177c] {\n  justify-content: flex-end;\n  align-items: flex-end;\n}\n.base_sent > .avatar[data-v-0d3e177c]:after {\n  content: \"\";\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid white;\n  border-right-color: transparent;\n  border-top-color: transparent;\n  box-shadow: 1px 1px 2px rgba(black, 0.2);\n}\n.msg_sent > time[data-v-0d3e177c] {\n  float: right;\n}\n.msg_container_base[data-v-0d3e177c]::-webkit-scrollbar-track {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-0d3e177c]::-webkit-scrollbar {\n  width: 5px;\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-0d3e177c]::-webkit-scrollbar-thumb {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #555;\n}\n.btn-group.dropup[data-v-0d3e177c] {\n  position: fixed;\n  left: 0px;\n  bottom: 0;\n}\n.replyMessageImage[data-v-0d3e177c] {\n  margin-left: 210px;\n}\n@media only screen and (max-width: 1000px) {\n.col-xs-4[data-v-0d3e177c] {\n    display: contents;\n}\n.active-users-top-bar[data-v-0d3e177c] {\n    color: black;\n    padding: 10px;\n    position: relative;\n    overflow: hidden;\n    display: flex;\n    justify-content: space-evenly;\n    height: 70px;\n}\n.chat-container[data-v-0d3e177c] {\n    position: fixed;\n    /* right: 20px; */\n    padding-right: 170px;\n    bottom: 0px;\n    width: 100%;\n    z-index: 10;\n    display: flex;\n    align-items: flex-end;\n    justify-content: flex-end;\n}\n.chat-window[data-v-0d3e177c] {\n    bottom: 0;\n    position: fixed;\n    /* float:right;\n    margin-left:10px; */\n    margin-right: 2px;\n    width: 180px;\n}\n.chatWindowBtns[data-v-0d3e177c] {\n    margin-right: 30px;\n}\n.messageImage[data-v-0d3e177c] {\n    height: 150px;\n    width: 100%;\n}\n.toggleChatContainer[data-v-0d3e177c] {\n    padding-right: 80px !important;\n}\n}\n", ""]);
 
 // exports
 
@@ -7172,7 +7881,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.col-md-2[data-v-251d44e2],\n.col-md-10[data-v-251d44e2] {\n  padding: 0;\n}\n.col-xs-4[data-v-251d44e2] {\n  left: 30px;\n}\n.panel[data-v-251d44e2] {\n  margin-bottom: 0px;\n}\n.panel-footer[data-v-251d44e2] {\n  padding: 10px 15px;\n  background-color: #f5f5f5;\n  border-top: 1px solid #ddd;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel-title[data-v-251d44e2] {\n  font-size: 16px;\n  margin-bottom: 0;\n}\n.btn-chat[data-v-251d44e2] {\n  height: 100%;\n}\n.chat-window[data-v-251d44e2] {\n  bottom: 0;\n  position: fixed;\n  /* float:right;\n    margin-left:10px; */\n  margin-right: 2px;\n  width: 360px;\n}\n.chat-window > div > .panel[data-v-251d44e2] {\n  border-radius: 5px 5px 0 0;\n}\n.icon_minim[data-v-251d44e2] {\n  padding: 2px 10px;\n}\n.msg_container_base[data-v-251d44e2] {\n  background: rgb(243, 241, 241);\n  margin: 0;\n  padding: 0 10px 10px;\n  height: 300px;\n  overflow-x: hidden;\n}\n.top-bar[data-v-251d44e2] {\n  background: #666;\n  color: white;\n  padding: 10px;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  justify-content: space-between;\n}\n.msg_receive[data-v-251d44e2] {\n  padding-left: 0;\n  margin-left: 0;\n}\n.msg_sent[data-v-251d44e2] {\n  padding-bottom: 20px !important;\n  margin-right: 0;\n}\n.messages[data-v-251d44e2] {\n  background: white;\n  padding: 10px;\n  border-radius: 2px;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  max-width: 100%;\n}\n.messages > p[data-v-251d44e2] {\n  font-size: 13px;\n  margin: 0 0 0.2rem 0;\n}\n.messages > time[data-v-251d44e2] {\n  font-size: 11px;\n  color: #ccc;\n}\n.msg_container[data-v-251d44e2] {\n  padding: 10px;\n  overflow: hidden;\n  display: flex;\n}\nimg[data-v-251d44e2] {\n  display: block;\n  width: 100%;\n}\n.avatar[data-v-251d44e2] {\n  position: relative;\n}\n.base_receive > .avatar[data-v-251d44e2]:after {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid #fff;\n  border-left-color: rgba(0, 0, 0, 0);\n  border-bottom-color: rgba(0, 0, 0, 0);\n}\n.base_sent[data-v-251d44e2] {\n  justify-content: flex-end;\n  align-items: flex-end;\n}\n.base_sent > .avatar[data-v-251d44e2]:after {\n  content: \"\";\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid white;\n  border-right-color: transparent;\n  border-top-color: transparent;\n  box-shadow: 1px 1px 2px rgba(black, 0.2);\n}\n.msg_sent > time[data-v-251d44e2] {\n  float: right;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar-track {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar {\n  width: 5px;\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar-thumb {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #555;\n}\n.btn-group.dropup[data-v-251d44e2] {\n  position: fixed;\n  left: 0px;\n  bottom: 0;\n}\n@media only screen and (max-width: 1000px) {\n.col-xs-4[data-v-251d44e2] {\n    display: contents;\n}\n}\n", ""]);
+exports.push([module.i, "\n.col-md-2[data-v-251d44e2],\n.col-md-10[data-v-251d44e2] {\n  padding: 0;\n}\n.col-xs-4[data-v-251d44e2] {\n  left: 30px;\n}\n.panel[data-v-251d44e2] {\n  margin-bottom: 0px;\n}\n.panel-footer[data-v-251d44e2] {\n  padding: 10px 15px;\n  background-color: #f5f5f5;\n  border-top: 1px solid #ddd;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel-title[data-v-251d44e2] {\n  font-size: 16px;\n  margin-bottom: 0;\n}\n.hideBtn[data-v-251d44e2] {\n  display: none;\n}\n.btn-chat[data-v-251d44e2] {\n  height: 100%;\n}\n.chat-window[data-v-251d44e2] {\n  bottom: 0;\n  position: fixed;\n  /* float:right;\n    margin-left:10px; */\n  margin-right: 2px;\n  width: 360px;\n}\n.messageImage[data-v-251d44e2] {\n  height: 150px;\n  width: 150px;\n}\n.chat-window > div > .panel[data-v-251d44e2] {\n  border-radius: 5px 5px 0 0;\n}\n.icon_minim[data-v-251d44e2] {\n  padding: 2px 10px;\n}\n.msg_container_base[data-v-251d44e2] {\n  background: rgb(243, 241, 241);\n  margin: 0;\n  padding: 0 10px 10px;\n  height: 300px;\n  overflow-x: hidden;\n}\n.top-bar[data-v-251d44e2] {\n  background: #666;\n  color: white;\n  padding: 10px;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  justify-content: space-between;\n}\n.msg_receive[data-v-251d44e2] {\n  padding-left: 0;\n  margin-left: 0;\n}\n.msg_sent[data-v-251d44e2] {\n  padding-bottom: 20px !important;\n  margin-right: 0;\n}\n.messages[data-v-251d44e2] {\n  background: white;\n  padding: 10px;\n  border-radius: 2px;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  max-width: 100%;\n}\n.messages > p[data-v-251d44e2] {\n  font-size: 13px;\n  margin: 0 0 0.2rem 0;\n}\n.messages > time[data-v-251d44e2] {\n  font-size: 11px;\n  color: #ccc;\n}\n.msg_container[data-v-251d44e2] {\n  padding: 10px;\n  overflow: hidden;\n  display: flex;\n}\nimg[data-v-251d44e2] {\n  display: block;\n  width: 100%;\n}\n.avatar[data-v-251d44e2] {\n  position: relative;\n}\n.base_receive > .avatar[data-v-251d44e2]:after {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid #fff;\n  border-left-color: rgba(0, 0, 0, 0);\n  border-bottom-color: rgba(0, 0, 0, 0);\n}\n.base_sent[data-v-251d44e2] {\n  justify-content: flex-end;\n  align-items: flex-end;\n}\n.base_sent > .avatar[data-v-251d44e2]:after {\n  content: \"\";\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid white;\n  border-right-color: transparent;\n  border-top-color: transparent;\n  box-shadow: 1px 1px 2px rgba(black, 0.2);\n}\n.msg_sent > time[data-v-251d44e2] {\n  float: right;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar-track {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar {\n  width: 5px;\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar-thumb {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #555;\n}\n.btn-group.dropup[data-v-251d44e2] {\n  position: fixed;\n  left: 0px;\n  bottom: 0;\n}\n.replyMessageImage[data-v-251d44e2] {\n  margin-left: 210px;\n}\n@media only screen and (max-width: 1000px) {\n.col-xs-4[data-v-251d44e2] {\n    display: contents;\n}\n.top-bar[data-v-251d44e2] {\n    color: white;\n    padding: 10px;\n    position: relative;\n    overflow: hidden;\n    display: flex;\n    justify-content: space-evenly;\n    height: 70px;\n}\n.chat-window[data-v-251d44e2] {\n    bottom: 0;\n    position: fixed;\n    /* float:right;\n    margin-left:10px; */\n    margin-right: 2px;\n    width: 180px;\n}\n.chatWindowBtns[data-v-251d44e2] {\n    margin-right: 30px;\n}\n.messageImage[data-v-251d44e2] {\n    height: 150px;\n    width: 100%;\n}\n}\n", ""]);
 
 // exports
 
@@ -46027,77 +46736,156 @@ var render = function() {
   return _c("div", { staticClass: "activeUsersBox" }, [
     _c(
       "div",
-      {
-        staticClass: "chat-wrapper",
-        class: { toggleOpacityClass: _vm.opacityClass },
-        staticStyle: { border: "1px solid grey" }
-      },
+      { staticClass: "chat-window col-xs-5 col-md-3 p-0 chat-wrapper" },
       [
-        _vm._m(0),
-        _vm._v(" "),
-        _vm._m(1),
-        _vm._v(" "),
-        _c("div", [
-          _c(
-            "ul",
-            {
-              staticClass: "chat-users-list",
-              staticStyle: { height: "auto", "overflow-y": "scroll" }
-            },
-            _vm._l(_vm.groups, function(group, index) {
-              return _c("li", { key: index }, [
+        _c("div", { staticClass: "col-xs-12 col-md-12 p-0" }, [
+          _c("div", { staticClass: "panel panel-default" }, [
+            _c("div", { staticClass: "panel-heading active-users-top-bar" }, [
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-md-4 col-xs-4" }, [
                 _c(
                   "a",
-                  {
-                    attrs: { href: "#chat" },
-                    on: {
-                      click: function($event) {
-                        return _vm.newChat(
-                          "group-" + group.name,
-                          undefined,
-                          group.id
+                  { staticStyle: { color: "black" }, attrs: { href: "#" } },
+                  [
+                    _c("span", {
+                      staticClass: "fas fa-chevron-down",
+                      attrs: { id: "minim_chat_window" },
+                      on: {
+                        click: function($event) {
+                          return _vm.minimize("active-users-panel-body")
+                        }
+                      }
+                    })
+                  ]
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _c(
+              "ul",
+              {
+                staticClass:
+                  "panel-body msg_container_base active-users-panel-body"
+              },
+              [
+                _vm._m(1),
+                _vm._v(" "),
+                _c("div", [
+                  _c(
+                    "ul",
+                    {
+                      staticClass: "chat-users-list",
+                      staticStyle: {
+                        height: "auto",
+                        "overflow-y": "scroll",
+                        "list-style": "none"
+                      }
+                    },
+                    _vm._l(_vm.groups, function(group, index) {
+                      return _c("li", { key: index }, [
+                        _c(
+                          "a",
+                          {
+                            attrs: { href: "#chat" },
+                            on: {
+                              click: function($event) {
+                                return _vm.newChat(
+                                  "group-" + group.name,
+                                  undefined,
+                                  group.id
+                                )
+                              }
+                            }
+                          },
+                          [_vm._v(_vm._s(group.name))]
                         )
+                      ])
+                    }),
+                    0
+                  )
+                ]),
+                _vm._v(" "),
+                _vm._m(2),
+                _vm._v(" "),
+                _c("div", [
+                  _c(
+                    "ul",
+                    {
+                      staticClass: "chat-users-list",
+                      staticStyle: {
+                        height: "450px",
+                        "overflow-y": "scroll",
+                        "list-style": "none"
                       }
-                    }
-                  },
-                  [_vm._v(_vm._s(group.name))]
-                )
-              ])
-            }),
-            0
-          )
-        ]),
-        _vm._v(" "),
-        _vm._m(2),
-        _vm._v(" "),
-        _c("div", [
-          _c(
-            "ul",
-            {
-              staticClass: "chat-users-list",
-              staticStyle: { height: "300px", "overflow-y": "scroll" }
-            },
-            _vm._l(_vm.users, function(user, index) {
-              return _c("li", { key: index }, [
-                _c(
-                  "a",
-                  {
-                    attrs: { href: "#chat" },
-                    on: {
-                      click: function($event) {
-                        return _vm.newChat(user.name, user.id)
-                      }
-                    }
-                  },
-                  [_vm._v(_vm._s(user.name))]
-                )
-              ])
-            }),
-            0
-          )
+                    },
+                    _vm._l(_vm.users, function(user, index) {
+                      return _c("li", { key: index }, [
+                        _c(
+                          "a",
+                          {
+                            staticStyle: {
+                              display: "flex",
+                              "margin-bottom": "10px"
+                            },
+                            attrs: { href: "#chat" },
+                            on: {
+                              click: function($event) {
+                                return _vm.newChat(
+                                  user.name,
+                                  user.id,
+                                  null,
+                                  user.image
+                                )
+                              }
+                            }
+                          },
+                          [
+                            user.image
+                              ? _c("img", {
+                                  staticStyle: {
+                                    width: "30px",
+                                    "margin-right": "10px"
+                                  },
+                                  attrs: {
+                                    src: "/images/" + user.image,
+                                    alt: ""
+                                  }
+                                })
+                              : _c("img", {
+                                  staticStyle: {
+                                    width: "30px",
+                                    "margin-right": "10px"
+                                  },
+                                  attrs: { src: "/images/avatar.png", alt: "" }
+                                }),
+                            _vm._v("\n\n                  " + _vm._s(user.name))
+                          ]
+                        )
+                      ])
+                    }),
+                    0
+                  )
+                ])
+              ]
+            )
+          ])
         ])
       ]
-    )
+    ),
+    _vm._v(" "),
+    _c("div", { staticStyle: { cursor: "pointer" } }, [
+      _c(
+        "div",
+        { staticClass: "activeUsersBtn", on: { click: _vm.toggleChatWrapper } },
+        [
+          _c("i", {
+            staticClass: "far fa-edit",
+            staticStyle: { "font-size": "20px", "margin-left": "17px" }
+          })
+        ]
+      )
+    ])
   ])
 }
 var staticRenderFns = [
@@ -46105,8 +46893,11 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "header" }, [
-      _c("h6", [_vm._v("Let's Chat - Online")])
+    return _c("div", { staticClass: "col-md-8 col-xs-8" }, [
+      _c("h3", { staticClass: "panel-title" }, [
+        _c("span", { staticClass: "glyphicon glyphicon-comment" }),
+        _vm._v("\n              Chat\n            ")
+      ])
     ])
   },
   function() {
@@ -46124,9 +46915,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "text-center p-2" }, [
-      _c("strong", { staticStyle: { color: "black" } }, [
-        _vm._v("Currently Active Users!")
-      ])
+      _c("strong", [_vm._v("Currently Active Users!")])
     ])
   }
 ]
@@ -46203,21 +46992,25 @@ var render = function() {
       _c("div", { staticClass: "col-xs-12 col-md-12 p-0" }, [
         _c("div", { staticClass: "panel panel-default" }, [
           _c("div", { staticClass: "panel-heading top-bar" }, [
-            _c(
-              "div",
-              {
-                staticClass: "col-md-8 col-xs-8",
-                staticStyle: { display: "contents" }
-              },
-              [
-                _c("h3", { staticClass: "panel-title" }, [
-                  _c("span", { staticClass: "glyphicon glyphicon-comment" }),
-                  _vm._v(
-                    "\n              " + _vm._s(_vm.userName) + "\n            "
-                  )
-                ])
-              ]
-            ),
+            _vm.userimage
+              ? _c("img", {
+                  attrs: {
+                    src: "/images/" + _vm.userimage,
+                    width: "25px",
+                    height: "25px",
+                    alt: ""
+                  }
+                })
+              : _vm._e(),
+            _vm._v(" "),
+            _c("div", { staticClass: "col-md-8 col-xs-8" }, [
+              _c("h3", { staticClass: "panel-title" }, [
+                _c("span", { staticClass: "glyphicon glyphicon-comment" }),
+                _vm._v(
+                  "\n\n              " + _vm._s(_vm.userName) + "\n            "
+                )
+              ])
+            ]),
             _vm._v(" "),
             _c("div", { staticClass: "col-md-4 col-xs-4" }, [
               _c("a", { attrs: { href: "#" } }, [
@@ -46277,18 +47070,158 @@ var render = function() {
                                 }
                               },
                               [
+                                message.replyingToMessage &&
+                                message.replyingToMessage.type == null
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass: "messageReply",
+                                        staticStyle: {
+                                          height: "auto",
+                                          width: "auto",
+                                          "background-color": "grey",
+                                          opacity: "30%",
+                                          padding: "10px",
+                                          color: "black",
+                                          "margin-top": "10px",
+                                          "border-radius": "5px",
+                                          "border-left": "3px solid red"
+                                        }
+                                      },
+                                      [
+                                        _c(
+                                          "p",
+                                          { staticClass: "messageReplyText" },
+                                          [
+                                            _vm._v(
+                                              "\n                        " +
+                                                _vm._s(
+                                                  message.replyingToMessage.user
+                                                    .name
+                                                ) +
+                                                ":\n                        " +
+                                                _vm._s(
+                                                  message.replyingToMessage
+                                                    .message
+                                                ) +
+                                                "\n                      "
+                                            )
+                                          ]
+                                        )
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                message.replyingToMessage &&
+                                message.replyingToMessage.type
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass: "messageReply",
+                                        staticStyle: {
+                                          height: "auto",
+                                          width: "auto",
+                                          "background-color": "grey",
+                                          opacity: "30%",
+                                          padding: "10px",
+                                          color: "black",
+                                          "margin-top": "10px",
+                                          "border-radius": "5px",
+                                          "border-left": "3px solid red"
+                                        }
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                      " +
+                                            _vm._s(
+                                              message.replyingToMessage.user
+                                                .name
+                                            ) +
+                                            ":\n                      "
+                                        ),
+                                        message.replyingToMessage.type ==
+                                        "image"
+                                          ? _c("img", {
+                                              staticClass: "messageReplyImage",
+                                              staticStyle: { width: "40px" },
+                                              attrs: {
+                                                src:
+                                                  "/chat/" +
+                                                  message.replyingToMessage
+                                                    .file,
+                                                height: "50px",
+                                                width: "50px",
+                                                alt: ""
+                                              }
+                                            })
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        message.replyingToMessage.type == "file"
+                                          ? _c(
+                                              "a",
+                                              {
+                                                staticClass:
+                                                  "messageReplyAttachment",
+                                                staticStyle: { color: "black" }
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass:
+                                                    "fas fa-paperclip"
+                                                })
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        message.replyingToMessage.type ==
+                                        "audio"
+                                          ? _c("i", {
+                                              staticClass:
+                                                "fas fa-microphone messageReplyAudio",
+                                              staticStyle: {
+                                                width: "-webkit-fill-available"
+                                              }
+                                            })
+                                          : _vm._e()
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                message.forwarded === 1
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass: "forwarded",
+                                        staticStyle: {
+                                          "background-color": "grey",
+                                          opacity: "0.3",
+                                          height: "30px",
+                                          width: "100%",
+                                          "font-weight": "lighter"
+                                        }
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass: "fas fa-arrow-right"
+                                        }),
+                                        _vm._v(
+                                          "\n                      forwarded\n                    "
+                                        )
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
                                 _c(
                                   "p",
                                   {
+                                    staticClass: "message",
                                     staticStyle: {
                                       "overflow-wrap": "break-word"
                                     }
                                   },
                                   [
                                     _c("strong", [
-                                      _vm._v(
-                                        _vm._s(message.user.name) + " said: "
-                                      )
+                                      _vm._v(_vm._s(message.user.name) + ": ")
                                     ]),
                                     _vm._v(
                                       _vm._s(message.message) +
@@ -46300,15 +47233,20 @@ var render = function() {
                                 _c(
                                   "time",
                                   { staticStyle: { color: "black" } },
-                                  [_vm._v(_vm._s(message.created_at))]
+                                  [
+                                    _vm._v(
+                                      _vm._s(
+                                        message.time
+                                          ? message.time
+                                          : message.created_at
+                                      )
+                                    )
+                                  ]
                                 ),
                                 _vm._v(" "),
                                 message.type == "image"
                                   ? _c("img", {
-                                      staticStyle: {
-                                        height: "150px",
-                                        width: "150px"
-                                      },
+                                      staticClass: "messageImage",
                                       attrs: {
                                         src: "/chat/" + message.file,
                                         alt: ""
@@ -46320,6 +47258,7 @@ var render = function() {
                                   ? _c(
                                       "a",
                                       {
+                                        staticClass: "messageAttachment",
                                         staticStyle: { color: "black" },
                                         attrs: {
                                           href: "chat/" + message.file,
@@ -46336,6 +47275,7 @@ var render = function() {
                                 _vm._v(" "),
                                 message.type == "audio"
                                   ? _c("audio", {
+                                      staticClass: "messageAudio",
                                       staticStyle: {
                                         width: "-webkit-fill-available"
                                       },
@@ -46369,8 +47309,189 @@ var render = function() {
                               },
                               [
                                 _c(
+                                  "div",
+                                  {
+                                    staticClass: "messageBtns",
+                                    staticStyle: {
+                                      display: "flex",
+                                      "justify-content": "flex-end"
+                                    }
+                                  },
+                                  [
+                                    _c("div", {
+                                      staticClass:
+                                        "fas fa-arrow-right forwardBtn",
+                                      staticStyle: {
+                                        cursor: "pointer",
+                                        "margin-right": "20px"
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.getUserRelatedUsersAnGroups(
+                                            $event,
+                                            message
+                                          )
+                                        }
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("div", {
+                                      staticClass: "fas fa-reply replyBtn",
+                                      staticStyle: {
+                                        float: "right",
+                                        cursor: "pointer"
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.messageReply(
+                                            $event,
+                                            message.id
+                                          )
+                                        }
+                                      }
+                                    })
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                message.replyingToMessage &&
+                                message.replyingToMessage.message
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass: "messageReply",
+                                        staticStyle: {
+                                          height: "auto",
+                                          width: "auto",
+                                          "background-color": "grey",
+                                          opacity: "30%",
+                                          padding: "10px",
+                                          color: "black",
+                                          "margin-top": "10px",
+                                          "border-radius": "5px",
+                                          "border-left": "3px solid red",
+                                          "margin-bottom": "5px"
+                                        }
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                      " +
+                                            _vm._s(
+                                              message.replyingToMessage.user
+                                                .name
+                                            ) +
+                                            ":\n                      " +
+                                            _vm._s(
+                                              message.replyingToMessage.message
+                                            ) +
+                                            "\n                    "
+                                        )
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                message.replyingToMessage &&
+                                message.replyingToMessage.type
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass: "messageReply",
+                                        staticStyle: {
+                                          height: "auto",
+                                          width: "auto",
+                                          "background-color": "grey",
+                                          opacity: "30%",
+                                          padding: "10px",
+                                          color: "black",
+                                          "margin-top": "10px",
+                                          "border-radius": "5px",
+                                          "border-left": "3px solid red",
+                                          "margin-bottom": "5px"
+                                        }
+                                      },
+                                      [
+                                        _vm._v(
+                                          "\n                      " +
+                                            _vm._s(
+                                              message.replyingToMessage.user
+                                                .name
+                                            ) +
+                                            ":\n                      "
+                                        ),
+                                        message.replyingToMessage.type ==
+                                        "image"
+                                          ? _c("img", {
+                                              staticClass: "messageReplyImage",
+                                              staticStyle: { width: "40px" },
+                                              attrs: {
+                                                src:
+                                                  "/chat/" +
+                                                  message.replyingToMessage
+                                                    .file,
+                                                height: "50px",
+                                                width: "50px",
+                                                alt: ""
+                                              }
+                                            })
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        message.replyingToMessage.type == "file"
+                                          ? _c(
+                                              "a",
+                                              {
+                                                staticClass:
+                                                  "messageReplyAttachment",
+                                                staticStyle: { color: "black" }
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass:
+                                                    "fas fa-paperclip"
+                                                })
+                                              ]
+                                            )
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        message.replyingToMessage.type ==
+                                        "audio"
+                                          ? _c("i", {
+                                              staticClass:
+                                                "fas fa-microphone messageReplyAudio",
+                                              staticStyle: {
+                                                width: "-webkit-fill-available"
+                                              }
+                                            })
+                                          : _vm._e()
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                message.forwarded == 1
+                                  ? _c(
+                                      "div",
+                                      {
+                                        staticClass: "forwarded",
+                                        staticStyle: {
+                                          "background-color": "grey",
+                                          opacity: "0.3",
+                                          height: "30px",
+                                          width: "100%"
+                                        }
+                                      },
+                                      [
+                                        _c("i", {
+                                          staticClass: "fas fa-arrow-right"
+                                        }),
+                                        _vm._v(
+                                          "\n                      forwarded\n                    "
+                                        )
+                                      ]
+                                    )
+                                  : _vm._e(),
+                                _vm._v(" "),
+                                _c(
                                   "p",
                                   {
+                                    staticClass: "messageText",
                                     staticStyle: {
                                       "overflow-wrap": "break-word",
                                       color: "white"
@@ -46378,9 +47499,7 @@ var render = function() {
                                   },
                                   [
                                     _c("strong", [
-                                      _vm._v(
-                                        _vm._s(message.user.name) + " said: "
-                                      )
+                                      _vm._v(_vm._s(message.user.name) + ": ")
                                     ]),
                                     _vm._v(
                                       _vm._s(message.message) +
@@ -46397,10 +47516,7 @@ var render = function() {
                                 _vm._v(" "),
                                 message.type == "image"
                                   ? _c("img", {
-                                      staticStyle: {
-                                        height: "150px",
-                                        width: "150px"
-                                      },
+                                      staticClass: "messageImage",
                                       attrs: {
                                         src: "/chat/" + message.file,
                                         alt: ""
@@ -46412,6 +47528,7 @@ var render = function() {
                                   ? _c(
                                       "a",
                                       {
+                                        staticClass: "messageAttachment",
                                         staticStyle: { color: "black" },
                                         attrs: {
                                           href: "chat/" + message.file,
@@ -46428,6 +47545,7 @@ var render = function() {
                                 _vm._v(" "),
                                 message.type == "audio"
                                   ? _c("audio", {
+                                      staticClass: "messageAudio",
                                       staticStyle: {
                                         width: "-webkit-fill-available"
                                       },
@@ -46526,12 +47644,11 @@ var render = function() {
               }),
               _vm._v(" "),
               _c("i", {
-                staticClass: "fas fa-stop-circle",
+                staticClass: "fas fa-stop-circle hideBtn",
                 staticStyle: {
                   cursor: "pointer",
                   "font-size": "25px",
-                  "margin-top": "3px",
-                  display: "none"
+                  "margin-top": "3px"
                 },
                 on: { click: _vm.stopRecording }
               })

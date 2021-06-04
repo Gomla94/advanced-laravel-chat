@@ -25,7 +25,7 @@ class MessageSentEvent implements ShouldBroadcastNow
      *
      * @return void
      */
-    public function __construct(Message $message, $authUser, $toUser)
+    public function __construct($message, $authUser, $toUser)
     {
         $this->message = $message;
         $this->authUser = $authUser;

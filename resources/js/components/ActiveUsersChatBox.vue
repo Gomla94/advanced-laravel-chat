@@ -1,59 +1,85 @@
 <template >
   <div class="activeUsersBox">
-    <div
-      class="chat-wrapper"
-      :class="{ toggleOpacityClass: opacityClass }"
-      style="border: 1px solid grey"
-    >
-      <div class="header">
-        <h6>Let's Chat - Online</h6>
-      </div>
-      <div class="text-center p-2">
-        <strong style="color: black">Joined Groups!</strong>
-      </div>
-      <div>
-        <ul class="chat-users-list" style="height: auto; overflow-y: scroll">
-          <li v-for="(group, index) in groups" :key="index">
-            <a
-              href="#chat"
-              @click="newChat(`group-${group.name}`, undefined, group.id)"
-              >{{ group.name }}</a
-            >
-          </li>
-        </ul>
-      </div>
-      <div class="text-center p-2">
-        <strong style="color: black">Currently Active Users!</strong>
-      </div>
-      <div>
-        <ul class="chat-users-list" style="height: 300px; overflow-y: scroll">
-          <li v-for="(user, index) in users" :key="index">
-            <a href="#chat" @click="newChat(user.name, user.id)">{{
-              user.name
-            }}</a>
-          </li>
-        </ul>
+    <div class="chat-window col-xs-5 col-md-3 p-0 chat-wrapper">
+      <div class="col-xs-12 col-md-12 p-0">
+        <div class="panel panel-default">
+          <div class="panel-heading active-users-top-bar">
+            <div class="col-md-8 col-xs-8">
+              <h3 class="panel-title">
+                <span class="glyphicon glyphicon-comment"></span>
+                Chat
+              </h3>
+            </div>
+            <div class="col-md-4 col-xs-4">
+              <a href="#" style="color: black"
+                ><span
+                  id="minim_chat_window"
+                  class="fas fa-chevron-down"
+                  @click="minimize('active-users-panel-body')"
+                ></span
+              ></a>
+            </div>
+          </div>
+          <ul class="panel-body msg_container_base active-users-panel-body">
+            <div class="text-center p-2">
+              <strong style="color: black">Joined Groups!</strong>
+            </div>
+            <div>
+              <ul
+                class="chat-users-list"
+                style="height: auto; overflow-y: scroll; list-style: none"
+              >
+                <li v-for="(group, index) in groups" :key="index">
+                  <a
+                    href="#chat"
+                    @click="newChat(`group-${group.name}`, undefined, group.id)"
+                    >{{ group.name }}</a
+                  >
+                </li>
+              </ul>
+            </div>
+
+            <div class="text-center p-2">
+              <strong>Currently Active Users!</strong>
+            </div>
+            <div>
+              <ul
+                class="chat-users-list"
+                style="height: 450px; overflow-y: scroll; list-style: none"
+              >
+                <li v-for="(user, index) in users" :key="index">
+                  <a
+                    style="display: flex; margin-bottom: 10px"
+                    href="#chat"
+                    @click="newChat(user.name, user.id, null, user.image)"
+                  >
+                    <img
+                      :src="'/images/' + user.image"
+                      v-if="user.image"
+                      alt=""
+                      style="width: 30px; margin-right: 10px"
+                    />
+                    <img
+                      src="/images/avatar.png"
+                      v-else
+                      alt=""
+                      style="width: 30px; margin-right: 10px"
+                    />
+
+                    {{ user.name }}</a
+                  >
+                </li>
+              </ul>
+            </div>
+          </ul>
+        </div>
       </div>
     </div>
-
-    <!-- <div style="z-index=10;margin-bottom:15px;cursor:pointer">
-      <div
-        class="activeUsersBtn"
-        style="
-          height: 50px;
-          width: 55px;
-          background-color: white;
-          margin-right: 100px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          box-shadow: 0px 7px 30px silver;
-        "
-        @click="toggleChatWrapper"
-      >
+    <div style="cursor: pointer">
+      <div class="activeUsersBtn" @click="toggleChatWrapper">
         <i class="far fa-edit" style="font-size: 20px; margin-left: 17px"></i>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -75,17 +101,25 @@ export default {
       //run the newChat function that is responsable for openeing the chat windows, so by doing this whenever i refresh
       //the page if there was any opened chat it will be automatically opened.
       this.usersOpenedChatArray.forEach((el) => {
-        this.newChat(el.name, el.id, el.groupid);
+        this.newChat(el.name, el.id, el.groupid, el.userimage);
       });
     }
 
-    console.log(this.usergroups);
+    // window.Echo.channel("joinChat-channel").listen(
+    //   "JoinChatChannelEvent",
+    //   (event) => {
+    //     this.users.push(event.user);
+    //   }
+    // );
+
+    // console.log(this.usergroups);
+
     this.groups = this.usergroups;
     this.groups.forEach((group) => {
       window.Echo.private(`group.${group.id}`).listen(
         "MessageSentEvent",
         (event) => {
-          console.log(event);
+          // console.log(event);
           this.messages.push(event.message);
           this.newChat(
             `group-${group.name}`,
@@ -114,40 +148,55 @@ export default {
     //if there is no session created then create one and put the usersOpenedChatArray in it,
     //because we are gonna use it to automatically open the previously opened chat windows.
 
-    console.log(this.authuser.id);
+    // console.log(this.authuser.id);
+
     if (!sessionStorage.getItem("usersOpenedChat")) {
       sessionStorage.setItem(
         "usersOpenedChat",
         JSON.stringify(this.usersOpenedChatArray)
       );
     }
+
     window.Echo.join("joinChat-channel")
       //here i am taking the logged in user and i am joining the unique private channel,
       //and i am passing the authenticated user id with other authenticated users id's,
       //then listen to the new message event then run the newChat function.
+
       .here((user) => {
         user.forEach((user) => {
-          console.log(user.id, this.authuser.id);
+          // console.log(user.image);
           if (user.id !== this.authuser.id) {
             this.users.push(user);
             window.Echo.private(
               `messages.${user.id}.${this.authuser.id}`
             ).listen("MessageSentEvent", (event) => {
-              console.log("hehehehe advancedchat");
-              this.newChat(user.name, user.id);
+              // console.log("hehehehe advancedchat");
+              this.newChat(
+                user.name,
+                user.id,
+                event.message.group_id,
+                user.image
+              );
             });
           }
         });
       })
+
       .joining((user) => {
-        console.log("joined");
+        // console.log("joined", user.image);
         //if a user was newly logged in then join the unique private channel, and listen to the new message event,
         //then run the newChat function.
+        console.log("joined");
         window.Echo.private(`messages.${user.id}.${this.authuser.id}`).listen(
           "MessageSentEvent",
           (event) => {
-            console.log("hehehehe advancedchat");
-            this.newChat(user.name, user.id);
+            // console.log("hehehehe advancedchat");
+            this.newChat(
+              user.name,
+              user.id,
+              event.message.group_id,
+              user.image
+            );
           }
         );
         this.users.push(user);
@@ -155,6 +204,7 @@ export default {
       .leaving((user) => {
         //when a user logged out or left the web site then filter the users array,
         //the users array is automatically listed in the active users box.
+        console.log("left");
         this.users = this.users.filter((u) => {
           return user.id != u.id;
         });
@@ -163,7 +213,7 @@ export default {
     window.Echo.private(`user.${this.authuser.id}`).listen(
       "GroupCreatedEvent",
       (event) => {
-        console.log("group created");
+        // console.log("group created");
         this.groups.push(event.group);
       }
     );
@@ -174,22 +224,43 @@ export default {
       this.opacityClass = !this.opacityClass;
     },
 
+    minimize(value) {
+      //this message is responsible for minimizing the chat box.
+      console.log(value);
+      const expandSpan = event.target;
+      if (!expandSpan.classList.contains("panel-collapsed")) {
+        $(`.active-users-panel-body`).slideUp();
+        expandSpan.classList.add("panel-collapsed");
+        // document.querySelector(`.panel-footer`).style.display = "none";
+        expandSpan.classList.remove("fa-minus");
+        expandSpan.classList.add("fa-chevron-up");
+      } else {
+        $(`.active-users-panel-body`).slideDown();
+        expandSpan.classList.remove("panel-collapsed");
+        document.querySelector(`.${value}`).style.display = "block";
+        expandSpan.classList.remove("fa-chevron-up");
+        expandSpan.classList.add("fa-chevron-down");
+      }
+    },
+
     toggleChatWrapper() {
       const chatWrapper = document.querySelector(".chat-wrapper");
       const activeUsersBtn = document.querySelector(".activeUsersBtn");
       const chatContainer = document.querySelector(".chat-container");
-      if (this.chatContainerToggledRight) {
-        this.chatContainerToggledRight = false;
-        chatContainer.style.paddingRight = "190px";
-      } else {
-        this.chatContainerToggledRight = true;
-        chatContainer.style.paddingRight = "80px";
-      }
+      chatContainer.classList.toggle("toggleChatContainer");
+      // if (this.chatContainerToggledRight) {
+      //   this.chatContainerToggledRight = false;
+      //   chatContainer.style.paddingRight = "190px";
+      // } else {
+      //   this.chatContainerToggledRight = true;
+      //   chatContainer.style.paddingRight = "80px";
+      // }
       activeUsersBtn.classList.toggle("toggleActiveUsersBtnRight");
       chatWrapper.classList.toggle("toggleDisplay");
     },
 
-    newChat(name, id, groupid) {
+    newChat(name, id, groupid, userimage) {
+      // console.log(name, id, groupid, userimage);
       this.usersOpenedChatArray = JSON.parse(
         sessionStorage.getItem("usersOpenedChat")
       );
@@ -199,7 +270,7 @@ export default {
       if (
         !this.usersOpenedChatArray.find((userChat) => userChat.name == name)
       ) {
-        let userChat = { id, name, groupid };
+        let userChat = { id, name, groupid, userimage };
         this.usersOpenedChatArray.push(userChat);
         sessionStorage.setItem(
           `usersOpenedChat`,
@@ -210,9 +281,11 @@ export default {
         ".componentContainer"
       );
 
+      console.log("newChat");
+      // return false;
       const alreadyExistedDiv = id
         ? document.getElementById(`componentContainer${id}`)
-        : document.getElementById(`componentContainer${name}`);
+        : document.getElementById(`componentContainerGroup${groupid}`);
 
       //if there is a chat window existed with this user id then return false.
       if (alreadyExistedDiv) return false;
@@ -228,14 +301,14 @@ export default {
 
       const chatContainer = document.querySelector(".chat-container");
       const componentContainer = document.createElement("div");
-      let componentConntainerId;
+      let componentContainerId;
       componentContainer.classList.add("componentContainer", "chatBox");
       if (id !== undefined) {
-        componentConntainerId = `componentContainer${id}`;
-        componentContainer.setAttribute("id", componentConntainerId);
+        componentContainerId = `componentContainer${id}`;
+        componentContainer.setAttribute("id", componentContainerId);
       } else {
-        componentConntainerId = `componentContainer${name}`;
-        componentContainer.setAttribute("id", componentConntainerId);
+        componentContainerId = `componentContainerGroup${groupid}`;
+        componentContainer.setAttribute("id", componentContainerId);
       }
 
       let vuecomp = Vue.extend(NewChatBox);
@@ -244,12 +317,15 @@ export default {
           fromUserID: this.authuser.id,
           toUserID: id,
           panelFooter:
-            id !== undefined ? `panel-footer-${id}` : `panel-footer-${name}`,
+            id !== undefined
+              ? `panel-footer-${id}`
+              : `panel-footer-group-${groupid}`,
           userName: name,
           usersOpenedChatArray: this.usersOpenedChatArray,
-          componentID: componentConntainerId,
+          componentID: componentContainerId,
           groupID: groupid,
           authuser: this.authuser,
+          userimage: userimage ? userimage : null,
         },
       }).$mount(componentContainer);
       componentContainer.append(comp.$el);
@@ -260,33 +336,50 @@ export default {
 </script>
 
 <style scoped>
-body {
-  background-color: #eee;
+.col-md-2,
+.col-md-10 {
+  padding: 0;
+}
+.col-xs-4 {
+  left: 30px;
+}
+.panel {
+  margin-bottom: 0px;
 }
 
-::-webkit-scrollbar {
-  width: 10px;
+.chat-container {
+  position: fixed;
+  /* right: 20px; */
+  padding-right: 340px;
+  bottom: 0px;
+  width: 100%;
+  z-index: 10;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
 }
 
-/* Track */
-::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey;
-  border-radius: 10px;
+.toggleChatContainer {
+  padding-right: 120px !important;
 }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: blue;
-  border-radius: 10px;
+.panel-footer {
+  padding: 10px 15px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #ddd;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #b30000;
-}
-
-.toggleOpacityClass {
-  opacity: 1 !important;
+.activeUsersBtn {
+  height: 50px;
+  width: 55px;
+  background-color: white;
+  margin-right: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  box-shadow: 0px 7px 30px silver;
 }
 
 .toggleDisplay {
@@ -298,85 +391,194 @@ body {
   bottom: 15px;
 }
 
-.chat-btn {
+.panel-title {
+  font-size: 16px;
+  margin-bottom: 0;
+}
+
+.hideBtn {
+  display: none;
+}
+
+.btn-chat {
+  height: 100%;
+}
+.chat-window {
+  bottom: 0;
   position: fixed;
-  right: 14px;
-  cursor: pointer;
-  width: 50px;
-  height: 50px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50px;
-  background-color: blue;
-  color: #fff;
-  font-size: 22px;
-  border: none;
+  /* float:right;
+    margin-left:10px; */
+  margin-right: 2px;
+  width: 300px;
+  right: 20px;
   z-index: 10;
+  box-shadow: 2px 2px 15px 1px grey !important;
 }
 
-.chat-btn .close {
-  display: none;
+.messageImage {
+  height: 150px;
+  width: 150px;
 }
 
-.chat-btn i {
-  transition: all 0.9s ease;
+.chat-window > div > .panel {
+  border-radius: 5px 5px 0 0;
 }
-
-#check:checked ~ .chat-btn i {
+.icon_minim {
+  padding: 2px 10px;
+}
+.msg_container_base {
+  margin: 0;
+  padding: 0 10px 10px;
+  overflow-x: hidden;
+}
+.active-users-top-bar {
+  color: black;
+  padding: 10px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+}
+.msg_receive {
+  padding-left: 0;
+  margin-left: 0;
+}
+.msg_sent {
+  padding-bottom: 20px !important;
+  margin-right: 0;
+}
+.messages {
+  background: white;
+  padding: 10px;
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  max-width: 100%;
+}
+.messages > p {
+  font-size: 13px;
+  margin: 0 0 0.2rem 0;
+}
+.messages > time {
+  font-size: 11px;
+  color: #ccc;
+}
+.msg_container {
+  padding: 10px;
+  overflow: hidden;
+  display: flex;
+}
+img {
   display: block;
-  pointer-events: auto;
-  /* transform: rotate(180deg) */
+  width: 100%;
+}
+.avatar {
+  position: relative;
+}
+.base_receive > .avatar:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border: 5px solid #fff;
+  border-left-color: rgba(0, 0, 0, 0);
+  border-bottom-color: rgba(0, 0, 0, 0);
 }
 
-#check:checked ~ .chat-btn .fa-commenting {
-  display: none;
+.base_sent {
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+.base_sent > .avatar:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border: 5px solid white;
+  border-right-color: transparent;
+  border-top-color: transparent;
+  box-shadow: 1px 1px 2px rgba(black, 0.2);
 }
 
-.chat-btn i {
-  font-size: 22px;
-  color: #fff !important;
+.msg_sent > time {
+  float: right;
 }
 
-#check:checked ~ .chat-wrapper {
-  opacity: 1;
+.msg_container_base::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);
+  background-color: #f5f5f5;
 }
 
-.header {
-  padding: 13px;
-  background-color: blue;
-  border-radius: 5px 5px 0px 0px;
-  margin-bottom: 10px;
-  color: #fff;
+.msg_container_base::-webkit-scrollbar {
+  width: 5px;
+  background-color: #f5f5f5;
 }
 
-.chat-form {
-  padding: 15px;
+.msg_container_base::-webkit-scrollbar-thumb {
+  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);
+  background-color: #555;
 }
 
-.chat-form input,
-textarea,
-button {
-  margin-bottom: 10px;
+.btn-group.dropup {
+  position: fixed;
+  left: 0px;
+  bottom: 0;
 }
 
-.chat-form textarea {
-  resize: none;
+.replyMessageImage {
+  margin-left: 210px;
 }
 
-.form-control:focus,
-.btn:focus {
-  box-shadow: none;
-}
+@media only screen and (max-width: 1000px) {
+  .col-xs-4 {
+    display: contents;
+  }
 
-.btn,
-.btn:focus,
-.btn:hover {
-  background-color: blue;
-  border: blue;
-}
+  .active-users-top-bar {
+    color: black;
+    padding: 10px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    justify-content: space-evenly;
+    height: 70px;
+  }
 
-#check {
-  display: none !important;
+  .chat-container {
+    position: fixed;
+    /* right: 20px; */
+    padding-right: 170px;
+    bottom: 0px;
+    width: 100%;
+    z-index: 10;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+  }
+
+  .chat-window {
+    bottom: 0;
+    position: fixed;
+    /* float:right;
+    margin-left:10px; */
+    margin-right: 2px;
+    width: 180px;
+  }
+
+  .chatWindowBtns {
+    margin-right: 30px;
+  }
+
+  .messageImage {
+    height: 150px;
+    width: 100%;
+  }
+
+  .toggleChatContainer {
+    padding-right: 80px !important;
+  }
 }
 </style>

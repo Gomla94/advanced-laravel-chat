@@ -22,22 +22,29 @@
     margin-right: 10px;
   }
 
-.chat-container {
-    position: fixed;
-    /* right: 20px; */
-    padding-right:230px;
-    bottom: 0px;
-    width: 100%;
-    z-index: 10;
-    display: flex;
-    align-items: flex-end;
-    justify-content: flex-end;
-}
 
 .activeUsersBox {
     margin-left:50px
 }
 
+.replyMessageImage {
+    margin-left: 210px;
+  }
+
+  .appendForwardedMessage {
+    background-color: rgb(184, 184, 184); color: black; padding:10px;width:290px; border-radius: 20px;
+  }
+
+  .appendForwardedImage {
+    height: 150px;
+    width: 150px;
+    margin-top:20px
+  }
+
+  .messageImage {
+    height: 150px;
+    width: 150px;
+  }
 
 @media only screen and (max-width: 1000px) {
     .col-xs-4 {
@@ -61,6 +68,10 @@
         margin-left:10px;
         margin-right:10px;
     }
+
+  .replyMessageImage {
+    margin-left: 40px;
+  }
 
   }
 /* 

@@ -16,8 +16,8 @@ class Message extends Model
         return $this->belongsTo(User::class, 'from', 'id');
     }
 
-    public function setCreatedAtAttribute($value)
-    {
-        $this->attributes['created_at'] = date_format($value, "g:i A");
-    }
+    // public function setCreatedAtAttribute($value)
+    // {
+    //     $this->attributes['created_at'] = date_format($value, "g:i A");
+    // }
 }

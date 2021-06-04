@@ -79,8 +79,8 @@
 
         <main class="py-4">
             @if (auth()->check())
-                <div class="chat-container" >
-                    <activeusers-chatbox :authuser="{{auth()->user()}}" :userGroups="{{auth()->user()->groups}}"></activeusers-chatbox>
+                <div >
+                    <activeusers-chatbox class="chat-container" :authuser="{{auth()->user()}}" :userGroups="{{auth()->user()->groups}}"></activeusers-chatbox>
                 </div>
             @endif
             <div class="container">
