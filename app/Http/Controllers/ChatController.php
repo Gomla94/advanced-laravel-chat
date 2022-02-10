@@ -28,8 +28,8 @@ class ChatController extends Controller
         $from = $request->from;
         $to = $request->to;
         $groupID = $request->groupid;
-        $myMessages = Message::where([['from', $from], ['to', $to]])
-            ->orWhere([['from', $to], ['to', $from]])
+        $myMessages = Message::where([ ['from', $from], ['to', $to] ])
+            ->orWhere([ ['from', $to], ['to', $from] ])
             ->orWhere([['group_id', $groupID]])
             ->with('user')->get();
 
