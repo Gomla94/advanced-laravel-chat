@@ -128,21 +128,11 @@ export default {
             });
         }
 
-        // window.Echo.channel("joinChat-channel").listen(
-        //   "JoinChatChannelEvent",
-        //   (event) => {
-        //     this.users.push(event.user);
-        //   }
-        // );
-
-        // console.log(this.usergroups);
-
         this.groups = this.usergroups;
         this.groups.forEach(group => {
             window.Echo.private(`group.${group.id}`).listen(
                 "MessageSentEvent",
                 event => {
-                    // console.log(event);
                     this.messages.push(event.message);
                     this.newChat(
                         `group-${group.name}`,
@@ -171,8 +161,6 @@ export default {
         //if there is no session created then create one and put the usersOpenedChatArray in it,
         //because we are gonna use it to automatically open the previously opened chat windows.
 
-        // console.log(this.authuser.id);
-
         if (!sessionStorage.getItem("usersOpenedChat")) {
             sessionStorage.setItem(
                 "usersOpenedChat",
@@ -187,13 +175,11 @@ export default {
 
             .here(user => {
                 user.forEach(user => {
-                    // console.log(user.image);
                     if (user.id !== this.authuser.id) {
                         this.users.push(user);
                         window.Echo.private(
                             `messages.${user.id}.${this.authuser.id}`
                         ).listen("MessageSentEvent", event => {
-                            // console.log("hehehehe advancedchat");
                             this.newChat(
                                 user.name,
                                 user.id,
@@ -206,14 +192,11 @@ export default {
             })
 
             .joining(user => {
-                // console.log("joined", user.image);
                 //if a user was newly logged in then join the unique private channel, and listen to the new message event,
                 //then run the newChat function.
-                console.log("joined");
                 window.Echo.private(
                     `messages.${user.id}.${this.authuser.id}`
                 ).listen("MessageSentEvent", event => {
-                    // console.log("hehehehe advancedchat");
                     this.newChat(
                         user.name,
                         user.id,
@@ -226,7 +209,6 @@ export default {
             .leaving(user => {
                 //when a user logged out or left the web site then filter the users array,
                 //the users array is automatically listed in the active users box.
-                console.log("left");
                 this.users = this.users.filter(u => {
                     return user.id != u.id;
                 });
@@ -235,7 +217,6 @@ export default {
         window.Echo.private(`user.${this.authuser.id}`).listen(
             "GroupCreatedEvent",
             event => {
-                // console.log("group created");
                 this.groups.push(event.group);
             }
         );
@@ -248,12 +229,10 @@ export default {
 
         minimize(value) {
             //this message is responsible for minimizing the chat box.
-            console.log(value);
             const expandSpan = event.target;
             if (!expandSpan.classList.contains("panel-collapsed")) {
                 $(`.active-users-panel-body`).slideUp();
                 expandSpan.classList.add("panel-collapsed");
-                // document.querySelector(`.panel-footer`).style.display = "none";
                 expandSpan.classList.remove("fa-minus");
                 expandSpan.classList.add("fa-chevron-up");
             } else {
@@ -282,7 +261,6 @@ export default {
         },
 
         newChat(name, id, groupid, userimage) {
-            // console.log(name, id, groupid, userimage);
             this.usersOpenedChatArray = JSON.parse(
                 sessionStorage.getItem("usersOpenedChat")
             );
@@ -305,8 +283,6 @@ export default {
                 ".componentContainer"
             );
 
-            console.log("newChat");
-            // return false;
             const alreadyExistedDiv = id
                 ? document.getElementById(`componentContainer${id}`)
                 : document.getElementById(`componentContainerGroup${groupid}`);

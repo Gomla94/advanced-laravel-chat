@@ -530,7 +530,6 @@ export default {
                 this.messages.push(event.message)
             );
         }
-        console.log(this.userName);
     },
 
     methods: {
@@ -550,7 +549,6 @@ export default {
                 .get(`/messages?from=${from}&to=${to}&groupid=${groupid}`)
                 .then(response => {
                     this.messages = response.data;
-                    // console.log(response.data);
                 });
         },
 
@@ -568,14 +566,10 @@ export default {
                 : null;
             if (replyDiv) replyDiv.remove();
 
-            // console.log(passedGroupID);
-            // return false;
-
             //send a new message to the backend and push this message to the messages array,
             //so that it appears in the chat box to the user that sent it.
             // this.newMessage = passedMessage ? passedMessage : "";
             if (passedMessage !== undefined) {
-                console.log("passedMessage");
                 this.newMessage = passedMessage;
             }
             if (this.newMessage === "") return false;
@@ -587,25 +581,24 @@ export default {
                 hour12: true
             });
 
-            axios
-                .post("/chat", {
-                    message: passedMessage ? passedMessage : this.newMessage,
-                    fromUser: this.fromUserID,
-                    toUser: passedGroupID
-                        ? null
-                        : passedToUser
-                        ? passedToUser
-                        : this.toUserID,
-                    groupID: passedToUser
-                        ? null
-                        : passedGroupID
-                        ? passedGroupID
-                        : this.groupID,
-                    created_at: currentTime,
-                    replyToMessageID: this.replyMessageID,
-                    forwarded: forwarded !== undefined ? 1 : 0
-                })
-                .then(response => console.log("response"));
+            axios.post("/chat", {
+                message: passedMessage ? passedMessage : this.newMessage,
+                fromUser: this.fromUserID,
+                toUser: passedGroupID
+                    ? null
+                    : passedToUser
+                    ? passedToUser
+                    : this.toUserID,
+                groupID: passedToUser
+                    ? null
+                    : passedGroupID
+                    ? passedGroupID
+                    : this.groupID,
+                created_at: currentTime,
+                replyToMessageID: this.replyMessageID,
+                forwarded: forwarded !== undefined ? 1 : 0
+            });
+
             if (!passedMessage) {
                 this.messages.push({
                     message: this.newMessage,
@@ -626,11 +619,6 @@ export default {
                     `#componentContainerGroup${passedGroupID}`
                 );
 
-                console.log(
-                    forwardToExistedUserChatWindow,
-                    forwardToExistedGroupChatWindow
-                );
-
                 messagesList = forwardToExistedUserChatWindow
                     ? forwardToExistedChatWindow.querySelector(
                           `#panel-footer-${passedToUser}`
@@ -641,10 +629,6 @@ export default {
             }
 
             if (messagesList) {
-                console.log("found");
-                // const messagesList = forwardToExistedChatWindow.querySelector(
-                //   `#panel-footer-${passedToUser}`
-                // );
                 const forwardedMessage = {
                     message: this.newMessage,
                     from: this.fromUserID,
@@ -673,8 +657,6 @@ export default {
 
                 messagesList.append(myForwardedMessage);
             }
-            // console.log(this.messages);
-            // console.log(this.newMessage);
 
             this.newMessage = "";
             this.replyingToMessage = null;
@@ -690,8 +672,6 @@ export default {
             passedGroup,
             forwarded
         ) {
-            // console.log(forwarded);
-            // return false;
             //this method is responsible of sending attachements files to the backend.
 
             const replyDiv = event
@@ -700,8 +680,6 @@ export default {
                       .querySelector(".replyDiv")
                 : null;
 
-            console.log(passedGroup, passedUser, this.toUserID);
-            // return false;
             if (replyDiv) replyDiv.remove();
 
             const time = new Date();
@@ -733,13 +711,10 @@ export default {
             data.append(
                 "groupID",
                 passedUser ? null : passedGroup ? passedGroup : this.groupID
-            ); // return false;
+            );
 
-            console.log(data);
-            // return false;
             const response = await axios.post("/chat", data);
-            console.log(response.data.message);
-            // return false;
+
             if (!passedImage) {
                 this.messages.push({
                     id: response.data.message.id,
@@ -763,11 +738,6 @@ export default {
 
                 const forwardToExistedGroupChatWindow = document.querySelector(
                     `#componentContainerGroup${passedGroup}`
-                );
-
-                console.log(
-                    forwardToExistedUserChatWindow,
-                    forwardToExistedGroupChatWindow
                 );
 
                 messagesList = forwardToExistedUserChatWindow
@@ -834,9 +804,6 @@ export default {
         ) {
             //this method is responsible of sending images to the backend.
 
-            console.log("forward image");
-            console.log(passedGroup);
-            // return false;
             const replyDiv = event
                 ? event.target
                       .closest(".panel-footer")
@@ -860,8 +827,6 @@ export default {
                 }
             }
 
-            console.log(passedUser, passedGroup, this.toUserID);
-            // return false;
             data.append("image", event !== null ? event.target.files[0] : null);
             data.append("file", passedImage);
             data.append(
@@ -907,25 +872,14 @@ export default {
                 `#componentContainerGroup${passedGroup}`
             );
 
-            console.log(
-                forwardToExistedUserChatWindow,
-                forwardToExistedGroupChatWindow
-            );
-
             let messagesList;
             if (passedUser || passedGroup) {
-                console.log("passedMessage");
                 const forwardToExistedUserChatWindow = document.querySelector(
                     `#componentContainer${passedUser}`
                 );
 
                 const forwardToExistedGroupChatWindow = document.querySelector(
                     `#componentContainerGroup${passedGroup}`
-                );
-
-                console.log(
-                    forwardToExistedUserChatWindow,
-                    forwardToExistedGroupChatWindow
                 );
 
                 messagesList = forwardToExistedUserChatWindow
@@ -938,10 +892,6 @@ export default {
             }
 
             if (messagesList) {
-                console.log("messageList");
-                // const messagesList = forwardToExistedChatWindow.querySelector(
-                //   `#panel-footer-${passedUser}`
-                // );
                 const forwardedMessage = {
                     message: this.newMessage,
                     from: this.fromUserID,
@@ -953,7 +903,6 @@ export default {
                 };
                 const myForwardedMessage = document.createElement("li");
                 myForwardedMessage.style.marginLeft = "-20px";
-                // myForwardedMessage.style.width = "380px";
                 myForwardedMessage.style.marginTop = "10px";
                 myForwardedMessage.innerHTML = `
             <div class="col-md-10 col-xs-10">
@@ -988,10 +937,6 @@ export default {
             navigator.mediaDevices
                 .getUserMedia({ audio: true })
                 .then(stream => {
-                    console.log(
-                        "getUserMedia() success, stream created, initializing Recorder.js ..."
-                    );
-
                     stopRecordingBtn.style.marginLeft = "100px";
                     recordingBtn.classList.toggle("hideBtn");
                     stopRecordingBtn.classList.toggle("hideBtn");
@@ -1003,7 +948,6 @@ export default {
                     this.recorder = new Recorder(this.input);
                     // //start the recording process
                     this.recorder.record();
-                    console.log("Recording started");
                 })
                 .catch(function(err) {
                     //enable the record button if getUserMedia() fails
@@ -1020,7 +964,6 @@ export default {
             this.recorder.stop();
             const stopRecordingBtn = event.target;
             const startRecordingBtn = stopRecordingBtn.previousElementSibling;
-            console.log(startRecordingBtn);
             startRecordingBtn.style.marginLeft = "100px";
             startRecordingBtn.classList.toggle("hideBtn");
             stopRecordingBtn.classList.toggle("hideBtn");
@@ -1039,9 +982,6 @@ export default {
             passedGroup,
             forwarded
         ) {
-            console.log("forward voice");
-
-            console.log(passedUser, passedGroup);
             // return false;
             const time = new Date();
             const currentTime = time.toLocaleString("en-US", {
@@ -1066,8 +1006,6 @@ export default {
                 passedUser ? null : passedGroup ? passedGroup : this.groupID
             );
             const response = await axios.post("/chat", formdata);
-
-            console.log(response);
 
             if (!passedVoice) {
                 this.messages.push({
@@ -1094,11 +1032,6 @@ export default {
                     `#componentContainerGroup${passedGroup}`
                 );
 
-                console.log(
-                    forwardToExistedUserChatWindow,
-                    forwardToExistedGroupChatWindow
-                );
-
                 messagesList = forwardToExistedUserChatWindow
                     ? forwardToExistedChatWindow.querySelector(
                           `#panel-footer-${passedUser}`
@@ -1109,7 +1042,6 @@ export default {
             }
 
             if (messagesList) {
-                console.log("audio message list");
                 const forwardedMessage = {
                     id: response.data.message.id,
                     message: this.newMessage,
@@ -1151,11 +1083,9 @@ export default {
         },
 
         minimize(value) {
-            console.log(value);
             //this message is responsible for minimizing the chat box.
             const expandSpan = event.target;
             if (!expandSpan.classList.contains("panel-collapsed")) {
-                console.log("if", value);
                 $(`#${value}`).slideUp();
                 expandSpan.classList.add("panel-collapsed");
                 document
@@ -1165,8 +1095,6 @@ export default {
                 expandSpan.classList.remove("fa-minus");
                 expandSpan.classList.add("fa-plus");
             } else {
-                console.log("else", value);
-
                 $(`#${value}`).slideDown();
                 expandSpan.classList.remove("panel-collapsed");
                 document.querySelector(`.${value}`).style.display = "block";
@@ -1204,7 +1132,6 @@ export default {
         },
 
         messageReply(event, messageid) {
-            // console.log(messageid);
             const replyBtn = event.target;
             const chatBoxFooter = replyBtn
                 .closest(".panel")
@@ -1213,8 +1140,6 @@ export default {
             const messageDiv = replyBtn.closest(".msg_sent");
             const existedReplyDiv = messageDiv.querySelector(".messageReply");
             const existedForwardDiv = messageDiv.querySelector(".forwarded");
-            console.log(messageDiv, existedReplyDiv, existedForwardDiv);
-            // return false;
             let appendreplyingDiv;
             let existedMessageImage = replyBtn
                 .closest(".col-md-10")
@@ -1228,10 +1153,7 @@ export default {
                 .closest(".col-md-10")
                 .querySelector(".messageAttachment");
 
-            // console.log(existedMessageAudio);
-
             if (existedReplyDiv && existedForwardDiv) {
-                console.log("contains reply and forwarded");
                 this.replyingToMessage = {
                     message: existedForwardDiv.nextElementSibling.textContent
                         .trim()
@@ -1261,12 +1183,7 @@ export default {
                 };
                 appendreplyingDiv = messageDiv.querySelector(".messageText")
                     .textContent;
-
-                console.log(appendreplyingDiv);
             } else {
-                console.log("no reply");
-                console.log(messageDiv.querySelector(".messageText"));
-                // return false;
                 this.replyingToMessage = {
                     message: messageDiv
                         .querySelector(".messageText")
@@ -1302,9 +1219,6 @@ export default {
 
             this.replyMessageID = messageid;
 
-            console.log(appendreplyingDiv);
-            // return false;
-
             this.appendReply(
                 replyBtn,
                 appendreplyingDiv,
@@ -1313,10 +1227,6 @@ export default {
                 existedMessageAudio,
                 existedMessageAttachment
             );
-
-            // return false;
-
-            // console.log(this.replyMessageID);
         },
 
         appendReply(
@@ -1350,7 +1260,6 @@ export default {
                     .slice(0, 1)
                     .join("")} <i class="fas fa-microphone"></i></p>`;
             } else if (existedMessageAttachment) {
-                console.log("attachment");
                 replyingDiv.innerHTML = `<p style=word-break:break-word>${appendreplyingDiv
                     .split(" ")
                     .slice(0, 1)
@@ -1475,8 +1384,7 @@ export default {
             const userId = event.target.dataset["userid"];
             const message = JSON.parse(event.target.dataset["message"]);
             const groupid = event.target.dataset["groupid"];
-            // console.log(message);
-            // return false;
+
             if (message.message !== null) {
                 this.sendMessage(null, message.message, userId, groupid, true);
             }
