@@ -1574,6 +1574,7 @@ export default {
     padding: 0 10px 10px;
     height: 300px;
     overflow-x: hidden;
+    list-style: none;
 }
 .top-bar {
     background: #666;
