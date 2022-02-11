@@ -68,6 +68,9 @@
                                     <a class="dropdown-item" href="{{ route('chatGroup.index') }}">
                                         All Groups
                                     </a>
+                                    <a class="dropdown-item" href="{{ route('chatGroup.create') }}">
+                                        Create Group
+                                    </a>
 
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
