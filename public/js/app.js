@@ -2006,6 +2006,29 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ["authuser", "divID", "usergroups"],
@@ -2023,19 +2046,11 @@ __webpack_require__.r(__webpack_exports__);
       this.usersOpenedChatArray.forEach(function (el) {
         _this.newChat(el.name, el.id, el.groupid, el.userimage);
       });
-    } // window.Echo.channel("joinChat-channel").listen(
-    //   "JoinChatChannelEvent",
-    //   (event) => {
-    //     this.users.push(event.user);
-    //   }
-    // );
-    // console.log(this.usergroups);
-
+    }
 
     this.groups = this.usergroups;
     this.groups.forEach(function (group) {
       window.Echo["private"]("group.".concat(group.id)).listen("MessageSentEvent", function (event) {
-        // console.log(event);
         _this.messages.push(event.message);
 
         _this.newChat("group-".concat(group.name), undefined, event.message.group_id);
@@ -2061,7 +2076,6 @@ __webpack_require__.r(__webpack_exports__);
 
     //if there is no session created then create one and put the usersOpenedChatArray in it,
     //because we are gonna use it to automatically open the previously opened chat windows.
-    // console.log(this.authuser.id);
     if (!sessionStorage.getItem("usersOpenedChat")) {
       sessionStorage.setItem("usersOpenedChat", JSON.stringify(this.usersOpenedChatArray));
     }
@@ -2071,23 +2085,18 @@ __webpack_require__.r(__webpack_exports__);
     //then listen to the new message event then run the newChat function.
     .here(function (user) {
       user.forEach(function (user) {
-        // console.log(user.image);
         if (user.id !== _this2.authuser.id) {
           _this2.users.push(user);
 
           window.Echo["private"]("messages.".concat(user.id, ".").concat(_this2.authuser.id)).listen("MessageSentEvent", function (event) {
-            // console.log("hehehehe advancedchat");
             _this2.newChat(user.name, user.id, event.message.group_id, user.image);
           });
         }
       });
     }).joining(function (user) {
-      // console.log("joined", user.image);
       //if a user was newly logged in then join the unique private channel, and listen to the new message event,
       //then run the newChat function.
-      console.log("joined");
       window.Echo["private"]("messages.".concat(user.id, ".").concat(_this2.authuser.id)).listen("MessageSentEvent", function (event) {
-        // console.log("hehehehe advancedchat");
         _this2.newChat(user.name, user.id, event.message.group_id, user.image);
       });
 
@@ -2095,13 +2104,11 @@ __webpack_require__.r(__webpack_exports__);
     }).leaving(function (user) {
       //when a user logged out or left the web site then filter the users array,
       //the users array is automatically listed in the active users box.
-      console.log("left");
       _this2.users = _this2.users.filter(function (u) {
         return user.id != u.id;
       });
     });
     window.Echo["private"]("user.".concat(this.authuser.id)).listen("GroupCreatedEvent", function (event) {
-      // console.log("group created");
       _this2.groups.push(event.group);
     });
   },
@@ -2111,13 +2118,11 @@ __webpack_require__.r(__webpack_exports__);
     },
     minimize: function minimize(value) {
       //this message is responsible for minimizing the chat box.
-      console.log(value);
       var expandSpan = event.target;
 
       if (!expandSpan.classList.contains("panel-collapsed")) {
         $(".active-users-panel-body").slideUp();
-        expandSpan.classList.add("panel-collapsed"); // document.querySelector(`.panel-footer`).style.display = "none";
-
+        expandSpan.classList.add("panel-collapsed");
         expandSpan.classList.remove("fa-minus");
         expandSpan.classList.add("fa-chevron-up");
       } else {
@@ -2144,7 +2149,6 @@ __webpack_require__.r(__webpack_exports__);
       chatWrapper.classList.toggle("toggleDisplay");
     },
     newChat: function newChat(name, id, groupid, userimage) {
-      // console.log(name, id, groupid, userimage);
       this.usersOpenedChatArray = JSON.parse(sessionStorage.getItem("usersOpenedChat")); //if window chat is opened with this user then do not put a new object in the usersOpenedChatArray,
       //this is why i am checking the usersOpenedChatArray.
 
@@ -2162,8 +2166,6 @@ __webpack_require__.r(__webpack_exports__);
       }
 
       var componentContainers = document.querySelectorAll(".componentContainer");
-      console.log("newChat"); // return false;
-
       var alreadyExistedDiv = id ? document.getElementById("componentContainer".concat(id)) : document.getElementById("componentContainerGroup".concat(groupid)); //if there is a chat window existed with this user id then return false.
 
       if (alreadyExistedDiv) return false; //if there are 3 opened chat windows and i wanna open a fourth one,
@@ -2236,9 +2238,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 /* harmony default export */ __webpack_exports__["default"] = ({
-  mounted: function mounted() {
-    console.log('Component mounted.');
-  }
+  mounted: function mounted() {}
 });
 
 /***/ }),
@@ -2264,6 +2264,104 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2681,8 +2779,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
         return _this.messages.push(event.message);
       });
     }
-
-    console.log(this.userName);
   },
   methods: {
     //this method is resonsable for toggling the chatBox opacity.
@@ -2695,7 +2791,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
       //get all messages between these 2 users and pass the returned messages to the messages array
       axios.get("/messages?from=".concat(from, "&to=").concat(to, "&groupid=").concat(groupid)).then(function (response) {
-        _this2.messages = response.data; // console.log(response.data);
+        _this2.messages = response.data;
       });
     },
     sendMessage: function sendMessage(event, passedMessage, passedToUser, passedGroupID, forwarded) {
@@ -2708,14 +2804,11 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
             switch (_context.prev = _context.next) {
               case 0:
                 replyDiv = event ? event.target.closest(".panel-footer").querySelector(".replyDiv") : null;
-                if (replyDiv) replyDiv.remove(); // console.log(passedGroupID);
-                // return false;
-                //send a new message to the backend and push this message to the messages array,
+                if (replyDiv) replyDiv.remove(); //send a new message to the backend and push this message to the messages array,
                 //so that it appears in the chat box to the user that sent it.
                 // this.newMessage = passedMessage ? passedMessage : "";
 
                 if (passedMessage !== undefined) {
-                  console.log("passedMessage");
                   _this3.newMessage = passedMessage;
                 }
 
@@ -2741,8 +2834,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                   created_at: currentTime,
                   replyToMessageID: _this3.replyMessageID,
                   forwarded: forwarded !== undefined ? 1 : 0
-                }).then(function (response) {
-                  return console.log("response");
                 });
 
                 if (!passedMessage) {
@@ -2760,15 +2851,10 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 if (passedToUser || passedGroupID) {
                   forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedToUser));
                   forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroupID));
-                  console.log(forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow);
                   messagesList = forwardToExistedUserChatWindow ? forwardToExistedChatWindow.querySelector("#panel-footer-".concat(passedToUser)) : forwardToExistedGroupChatWindow.querySelector("#panel-footer-group-".concat(passedGroupID));
                 }
 
                 if (messagesList) {
-                  console.log("found"); // const messagesList = forwardToExistedChatWindow.querySelector(
-                  //   `#panel-footer-${passedToUser}`
-                  // );
-
                   forwardedMessage = {
                     message: _this3.newMessage,
                     from: _this3.fromUserID,
@@ -2784,9 +2870,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                   myForwardedMessage.style.marginTop = "10px";
                   myForwardedMessage.innerHTML = "\n            <div class=\"col-md-10 col-xs-10\">\n              <div class=\"messages msg_receive appendForwardedMessage\">\n                <div class=\"messages msg_receive\" style=\"background-color: grey; opacity: 0.3; height: 30px; width: 100%;\">\n                  <i class=\"fas fa-arrow-right\"><span style=\"font-family:Nunito\"></span></i>\n                  forwarded\n                </div>\n                <p class=\"message\" style=\"overflow-wrap: break-word;margin-bottom:4px\">\n                    <strong>".concat(forwardedMessage.user.name, ": </strong>").concat(forwardedMessage.message, "\n                </p>\n                <time style=\"color:black;font-size:11px\">").concat(forwardedMessage.created_at, "</time>\n              </div>\n            </div>\n        ");
                   messagesList.append(myForwardedMessage);
-                } // console.log(this.messages);
-                // console.log(this.newMessage);
-
+                }
 
                 _this3.newMessage = "";
                 _this3.replyingToMessage = null;
@@ -2811,12 +2895,8 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                // console.log(forwarded);
-                // return false;
                 //this method is responsible of sending attachements files to the backend.
                 replyDiv = event ? event.target.closest(".panel-footer").querySelector(".replyDiv") : null;
-                console.log(passedGroup, passedUser, _this4.toUserID); // return false;
-
                 if (replyDiv) replyDiv.remove();
                 time = new Date();
                 currentTime = time.toLocaleString("en-US", {
@@ -2838,16 +2918,12 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                   data.append("replyToMessageID", _this4.replyMessageID);
                 }
 
-                data.append("groupID", passedUser ? null : passedGroup ? passedGroup : _this4.groupID); // return false;
-
-                console.log(data); // return false;
-
-                _context2.next = 19;
+                data.append("groupID", passedUser ? null : passedGroup ? passedGroup : _this4.groupID);
+                _context2.next = 17;
                 return axios.post("/chat", data);
 
-              case 19:
+              case 17:
                 response = _context2.sent;
-                console.log(response.data.message); // return false;
 
                 if (!passedImage) {
                   _this4.messages.push((_this4$messages$push = {
@@ -2865,7 +2941,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 if (passedUser || passedGroup) {
                   forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedUser));
                   forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroup));
-                  console.log(forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow);
                   messagesList = forwardToExistedUserChatWindow ? forwardToExistedChatWindow.querySelector("#panel-footer-".concat(passedUser)) : forwardToExistedGroupChatWindow.querySelector("#panel-footer-group-".concat(passedGroup));
                 }
 
@@ -2894,7 +2969,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 _this4.groupID = null;
                 if (event) event.target.value = "";
 
-              case 29:
+              case 26:
               case "end":
                 return _context2.stop();
             }
@@ -2913,9 +2988,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
             switch (_context3.prev = _context3.next) {
               case 0:
                 //this method is responsible of sending images to the backend.
-                console.log("forward image");
-                console.log(passedGroup); // return false;
-
                 replyDiv = event ? event.target.closest(".panel-footer").querySelector(".replyDiv") : null;
                 if (replyDiv) replyDiv.remove();
                 time = new Date();
@@ -2927,23 +2999,22 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 data = new FormData();
 
                 if (!(event !== null)) {
-                  _context3.next = 12;
+                  _context3.next = 11;
                   break;
                 }
 
                 _this5.image = event.target.files[0];
+                console.log(_this5.image.size);
 
-                if (!(_this5.image.size > 20048)) {
-                  _context3.next = 12;
+                if (!(_this5.image.size > 2000048)) {
+                  _context3.next = 11;
                   break;
                 }
 
                 alert("Max image size is 2MB");
                 return _context3.abrupt("return", false);
 
-              case 12:
-                console.log(passedUser, passedGroup, _this5.toUserID); // return false;
-
+              case 11:
                 data.append("image", event !== null ? event.target.files[0] : null);
                 data.append("file", passedImage);
                 data.append("toUser", passedGroup ? null : passedUser ? passedUser : _this5.toUserID);
@@ -2957,10 +3028,10 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 }
 
                 data.append("groupID", passedUser ? null : passedGroup ? passedGroup : _this5.groupID);
-                _context3.next = 24;
+                _context3.next = 22;
                 return axios.post("/chat", data);
 
-              case 24:
+              case 22:
                 response = _context3.sent;
 
                 // return false;
@@ -2979,21 +3050,14 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
 
                 forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedUser));
                 forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroup));
-                console.log(forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow);
 
                 if (passedUser || passedGroup) {
-                  console.log("passedMessage");
                   _forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedUser));
                   _forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroup));
-                  console.log(_forwardToExistedUserChatWindow, _forwardToExistedGroupChatWindow);
                   messagesList = _forwardToExistedUserChatWindow ? forwardToExistedChatWindow.querySelector("#panel-footer-".concat(passedUser)) : _forwardToExistedGroupChatWindow.querySelector("#panel-footer-group-".concat(passedGroup));
                 }
 
                 if (messagesList) {
-                  console.log("messageList"); // const messagesList = forwardToExistedChatWindow.querySelector(
-                  //   `#panel-footer-${passedUser}`
-                  // );
-
                   forwardedMessage = {
                     message: _this5.newMessage,
                     from: _this5.fromUserID,
@@ -3006,8 +3070,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                     replyingToMessage: _this5.replyingToMessage
                   };
                   myForwardedMessage = document.createElement("li");
-                  myForwardedMessage.style.marginLeft = "-20px"; // myForwardedMessage.style.width = "380px";
-
+                  myForwardedMessage.style.marginLeft = "-20px";
                   myForwardedMessage.style.marginTop = "10px";
                   myForwardedMessage.innerHTML = "\n            <div class=\"col-md-10 col-xs-10\">\n              <div class=\"messages msg_receive appendForwardedMessage\">\n                <div class=\"messages msg_receive\" style=\"background-color: grey; opacity: 0.3; height: 30px; width: 100%;\">\n                  <i class=\"fas fa-arrow-right\"><span style=\"margin-left:4px;font-family:Nunito\">forwarded</span></i>\n                </div>\n                <p class=\"message\" style=\"overflow-wrap: break-word;margin-bottom:4px\">\n                    <strong>".concat(forwardedMessage.user.name, ": </strong>\n                </p>\n                <time style=\"color:black;font-size:11px;position:absolute\">").concat(forwardedMessage.created_at, "</time>\n                <img src=\"/chat/").concat(forwardedMessage.file, "\" class=\"appendForwardedImage\">\n              </div>\n            </div>\n        ");
                   messagesList.append(myForwardedMessage);
@@ -3019,7 +3082,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 _this5.groupID = null;
                 if (event) event.target.value = "";
 
-              case 36:
+              case 33:
               case "end":
                 return _context3.stop();
             }
@@ -3036,7 +3099,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       navigator.mediaDevices.getUserMedia({
         audio: true
       }).then(function (stream) {
-        console.log("getUserMedia() success, stream created, initializing Recorder.js ...");
         stopRecordingBtn.style.marginLeft = "100px";
         recordingBtn.classList.toggle("hideBtn");
         stopRecordingBtn.classList.toggle("hideBtn");
@@ -3051,8 +3113,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
         _this6.recorder = new Recorder(_this6.input); // //start the recording process
 
         _this6.recorder.record();
-
-        console.log("Recording started");
       })["catch"](function (err) {
         //enable the record button if getUserMedia() fails
         console.log(err);
@@ -3064,7 +3124,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       this.recorder.stop();
       var stopRecordingBtn = event.target;
       var startRecordingBtn = stopRecordingBtn.previousElementSibling;
-      console.log(startRecordingBtn);
       startRecordingBtn.style.marginLeft = "100px";
       startRecordingBtn.classList.toggle("hideBtn");
       stopRecordingBtn.classList.toggle("hideBtn");
@@ -3098,9 +3157,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
-                console.log("forward voice");
-                console.log(passedUser, passedGroup); // return false;
-
+                // return false;
                 time = new Date();
                 currentTime = time.toLocaleString("en-US", {
                   hour: "numeric",
@@ -3121,12 +3178,11 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 }
 
                 formdata.append("groupID", passedUser ? null : passedGroup ? passedGroup : _this8.groupID);
-                _context5.next = 16;
+                _context5.next = 14;
                 return axios.post("/chat", formdata);
 
-              case 16:
+              case 14:
                 response = _context5.sent;
-                console.log(response);
 
                 if (!passedVoice) {
                   _this8.messages.push((_this8$messages$push = {
@@ -3144,12 +3200,10 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 if (passedUser || passedGroup) {
                   forwardToExistedUserChatWindow = document.querySelector("#componentContainer".concat(passedUser));
                   forwardToExistedGroupChatWindow = document.querySelector("#componentContainerGroup".concat(passedGroup));
-                  console.log(forwardToExistedUserChatWindow, forwardToExistedGroupChatWindow);
                   messagesList = forwardToExistedUserChatWindow ? forwardToExistedChatWindow.querySelector("#panel-footer-".concat(passedUser)) : forwardToExistedGroupChatWindow.querySelector("#panel-footer-group-".concat(passedGroup));
                 }
 
                 if (messagesList) {
-                  console.log("audio message list");
                   forwardedMessage = (_forwardedMessage2 = {
                     id: response.data.message.id,
                     message: _this8.newMessage,
@@ -3172,7 +3226,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
                 _this8.replyMessageID = null;
                 _this8.groupID = null;
 
-              case 24:
+              case 21:
               case "end":
                 return _context5.stop();
             }
@@ -3181,12 +3235,10 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       }))();
     },
     minimize: function minimize(value) {
-      console.log(value); //this message is responsible for minimizing the chat box.
-
+      //this message is responsible for minimizing the chat box.
       var expandSpan = event.target;
 
       if (!expandSpan.classList.contains("panel-collapsed")) {
-        console.log("if", value);
         jquery__WEBPACK_IMPORTED_MODULE_1___default()("#".concat(value)).slideUp();
         expandSpan.classList.add("panel-collapsed");
         document.querySelector(".panel-footer").classList.add("panel-collapsed");
@@ -3194,7 +3246,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
         expandSpan.classList.remove("fa-minus");
         expandSpan.classList.add("fa-plus");
       } else {
-        console.log("else", value);
         jquery__WEBPACK_IMPORTED_MODULE_1___default()("#".concat(value)).slideDown();
         expandSpan.classList.remove("panel-collapsed");
         document.querySelector(".".concat(value)).style.display = "block";
@@ -3220,21 +3271,17 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       document.getElementById("".concat(divClass)).remove();
     },
     messageReply: function messageReply(event, messageid) {
-      // console.log(messageid);
       var replyBtn = event.target;
       var chatBoxFooter = replyBtn.closest(".panel").querySelector(".panel-footer");
       var messageDiv = replyBtn.closest(".msg_sent");
       var existedReplyDiv = messageDiv.querySelector(".messageReply");
       var existedForwardDiv = messageDiv.querySelector(".forwarded");
-      console.log(messageDiv, existedReplyDiv, existedForwardDiv); // return false;
-
       var appendreplyingDiv;
       var existedMessageImage = replyBtn.closest(".col-md-10").querySelector(".messageImage");
       var existedMessageAudio = replyBtn.closest(".col-md-10").querySelector(".messageAudio");
-      var existedMessageAttachment = replyBtn.closest(".col-md-10").querySelector(".messageAttachment"); // console.log(existedMessageAudio);
+      var existedMessageAttachment = replyBtn.closest(".col-md-10").querySelector(".messageAttachment");
 
       if (existedReplyDiv && existedForwardDiv) {
-        console.log("contains reply and forwarded");
         this.replyingToMessage = {
           message: existedForwardDiv.nextElementSibling.textContent.trim().split(" ").splice(1).join(" "),
           user: {
@@ -3244,11 +3291,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
           type: existedMessageAudio ? "audio" : existedMessageImage ? "image" : existedMessageAttachment ? "file" : null
         };
         appendreplyingDiv = messageDiv.querySelector(".messageText").textContent;
-        console.log(appendreplyingDiv);
       } else {
-        console.log("no reply");
-        console.log(messageDiv.querySelector(".messageText")); // return false;
-
         this.replyingToMessage = {
           message: messageDiv.querySelector(".messageText").textContent.trim().split(" ").splice(1).join(" "),
           user: {
@@ -3261,10 +3304,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       }
 
       this.replyMessageID = messageid;
-      console.log(appendreplyingDiv); // return false;
-
-      this.appendReply(replyBtn, appendreplyingDiv, chatBoxFooter, existedMessageImage, existedMessageAudio, existedMessageAttachment); // return false;
-      // console.log(this.replyMessageID);
+      this.appendReply(replyBtn, appendreplyingDiv, chatBoxFooter, existedMessageImage, existedMessageAudio, existedMessageAttachment);
     },
     appendReply: function appendReply(replyBtn, appendreplyingDiv, chatBoxFooter) {
       var existedMessageImage = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -3289,7 +3329,6 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
       } else if (existedMessageAudio) {
         replyingDiv.innerHTML = "<p style=word-break:break-word>".concat(appendreplyingDiv.split(" ").slice(0, 1).join(""), " <i class=\"fas fa-microphone\"></i></p>");
       } else if (existedMessageAttachment) {
-        console.log("attachment");
         replyingDiv.innerHTML = "<p style=word-break:break-word>".concat(appendreplyingDiv.split(" ").slice(0, 1).join(""), " <i class=\"fas fa-paperclip\"></i></p>");
       } else {
         replyingDiv.innerHTML = "<p style=word-break:break-word>".concat(appendreplyingDiv, "</p>");
@@ -3381,8 +3420,7 @@ window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.
     forward: function forward(event) {
       var userId = event.target.dataset["userid"];
       var message = JSON.parse(event.target.dataset["message"]);
-      var groupid = event.target.dataset["groupid"]; // console.log(message);
-      // return false;
+      var groupid = event.target.dataset["groupid"];
 
       if (message.message !== null) {
         this.sendMessage(null, message.message, userId, groupid, true);
@@ -7862,7 +7900,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.col-md-2[data-v-0d3e177c],\n.col-md-10[data-v-0d3e177c] {\n  padding: 0;\n}\n.col-xs-4[data-v-0d3e177c] {\n  left: 30px;\n}\n.panel[data-v-0d3e177c] {\n  margin-bottom: 0px;\n}\n.chat-container[data-v-0d3e177c] {\n  position: fixed;\n  /* right: 20px; */\n  padding-right: 340px;\n  bottom: 0px;\n  width: 100%;\n  z-index: 10;\n  display: flex;\n  align-items: flex-end;\n  justify-content: flex-end;\n}\n.toggleChatContainer[data-v-0d3e177c] {\n  padding-right: 120px !important;\n}\n.panel-footer[data-v-0d3e177c] {\n  padding: 10px 15px;\n  background-color: #f5f5f5;\n  border-top: 1px solid #ddd;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.activeUsersBtn[data-v-0d3e177c] {\n  height: 50px;\n  width: 55px;\n  background-color: white;\n  margin-right: 50px;\n  border-radius: 50%;\n  display: flex;\n  align-items: center;\n  box-shadow: 0px 7px 30px silver;\n}\n.toggleDisplay[data-v-0d3e177c] {\n  display: none;\n}\n.toggleActiveUsersBtnRight[data-v-0d3e177c] {\n  position: fixed;\n  bottom: 15px;\n}\n.panel-title[data-v-0d3e177c] {\n  font-size: 16px;\n  margin-bottom: 0;\n}\n.hideBtn[data-v-0d3e177c] {\n  display: none;\n}\n.btn-chat[data-v-0d3e177c] {\n  height: 100%;\n}\n.chat-window[data-v-0d3e177c] {\n  bottom: 0;\n  position: fixed;\n  /* float:right;\n    margin-left:10px; */\n  margin-right: 2px;\n  width: 300px;\n  right: 20px;\n  z-index: 10;\n  box-shadow: 2px 2px 15px 1px grey !important;\n}\n.messageImage[data-v-0d3e177c] {\n  height: 150px;\n  width: 150px;\n}\n.chat-window > div > .panel[data-v-0d3e177c] {\n  border-radius: 5px 5px 0 0;\n}\n.icon_minim[data-v-0d3e177c] {\n  padding: 2px 10px;\n}\n.msg_container_base[data-v-0d3e177c] {\n  margin: 0;\n  padding: 0 10px 10px;\n  overflow-x: hidden;\n}\n.active-users-top-bar[data-v-0d3e177c] {\n  color: black;\n  padding: 10px;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  justify-content: space-between;\n}\n.msg_receive[data-v-0d3e177c] {\n  padding-left: 0;\n  margin-left: 0;\n}\n.msg_sent[data-v-0d3e177c] {\n  padding-bottom: 20px !important;\n  margin-right: 0;\n}\n.messages[data-v-0d3e177c] {\n  background: white;\n  padding: 10px;\n  border-radius: 2px;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  max-width: 100%;\n}\n.messages > p[data-v-0d3e177c] {\n  font-size: 13px;\n  margin: 0 0 0.2rem 0;\n}\n.messages > time[data-v-0d3e177c] {\n  font-size: 11px;\n  color: #ccc;\n}\n.msg_container[data-v-0d3e177c] {\n  padding: 10px;\n  overflow: hidden;\n  display: flex;\n}\nimg[data-v-0d3e177c] {\n  display: block;\n  width: 100%;\n}\n.avatar[data-v-0d3e177c] {\n  position: relative;\n}\n.base_receive > .avatar[data-v-0d3e177c]:after {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid #fff;\n  border-left-color: rgba(0, 0, 0, 0);\n  border-bottom-color: rgba(0, 0, 0, 0);\n}\n.base_sent[data-v-0d3e177c] {\n  justify-content: flex-end;\n  align-items: flex-end;\n}\n.base_sent > .avatar[data-v-0d3e177c]:after {\n  content: \"\";\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid white;\n  border-right-color: transparent;\n  border-top-color: transparent;\n  box-shadow: 1px 1px 2px rgba(black, 0.2);\n}\n.msg_sent > time[data-v-0d3e177c] {\n  float: right;\n}\n.msg_container_base[data-v-0d3e177c]::-webkit-scrollbar-track {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-0d3e177c]::-webkit-scrollbar {\n  width: 5px;\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-0d3e177c]::-webkit-scrollbar-thumb {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #555;\n}\n.btn-group.dropup[data-v-0d3e177c] {\n  position: fixed;\n  left: 0px;\n  bottom: 0;\n}\n.replyMessageImage[data-v-0d3e177c] {\n  margin-left: 210px;\n}\n@media only screen and (max-width: 1000px) {\n.col-xs-4[data-v-0d3e177c] {\n    display: contents;\n}\n.active-users-top-bar[data-v-0d3e177c] {\n    color: black;\n    padding: 10px;\n    position: relative;\n    overflow: hidden;\n    display: flex;\n    justify-content: space-evenly;\n    height: 70px;\n}\n.chat-container[data-v-0d3e177c] {\n    position: fixed;\n    /* right: 20px; */\n    padding-right: 170px;\n    bottom: 0px;\n    width: 100%;\n    z-index: 10;\n    display: flex;\n    align-items: flex-end;\n    justify-content: flex-end;\n}\n.chat-window[data-v-0d3e177c] {\n    bottom: 0;\n    position: fixed;\n    /* float:right;\n    margin-left:10px; */\n    margin-right: 2px;\n    width: 180px;\n}\n.chatWindowBtns[data-v-0d3e177c] {\n    margin-right: 30px;\n}\n.messageImage[data-v-0d3e177c] {\n    height: 150px;\n    width: 100%;\n}\n.toggleChatContainer[data-v-0d3e177c] {\n    padding-right: 80px !important;\n}\n}\n", ""]);
+exports.push([module.i, "\n.col-md-2[data-v-0d3e177c],\n.col-md-10[data-v-0d3e177c] {\n    padding: 0;\n}\n.col-xs-4[data-v-0d3e177c] {\n    left: 30px;\n}\n.panel[data-v-0d3e177c] {\n    margin-bottom: 0px;\n}\n.chat-container[data-v-0d3e177c] {\n    position: fixed;\n    /* right: 20px; */\n    padding-right: 340px;\n    bottom: 0px;\n    width: 100%;\n    z-index: 10;\n    display: flex;\n    align-items: flex-end;\n    justify-content: flex-end;\n}\n.toggleChatContainer[data-v-0d3e177c] {\n    padding-right: 120px !important;\n}\n.panel-footer[data-v-0d3e177c] {\n    padding: 10px 15px;\n    background-color: #f5f5f5;\n    border-top: 1px solid #ddd;\n    border-bottom-right-radius: 3px;\n    border-bottom-left-radius: 3px;\n}\n.activeUsersBtn[data-v-0d3e177c] {\n    height: 50px;\n    width: 55px;\n    background-color: white;\n    margin-right: 50px;\n    border-radius: 50%;\n    display: flex;\n    align-items: center;\n    box-shadow: 0px 7px 30px silver;\n}\n.toggleDisplay[data-v-0d3e177c] {\n    display: none;\n}\n.toggleActiveUsersBtnRight[data-v-0d3e177c] {\n    position: fixed;\n    bottom: 15px;\n}\n.panel-title[data-v-0d3e177c] {\n    font-size: 16px;\n    margin-bottom: 0;\n}\n.hideBtn[data-v-0d3e177c] {\n    display: none;\n}\n.btn-chat[data-v-0d3e177c] {\n    height: 100%;\n}\n.chat-window[data-v-0d3e177c] {\n    bottom: 0;\n    position: fixed;\n    /* float:right;\n    margin-left:10px; */\n    margin-right: 2px;\n    width: 300px;\n    right: 20px;\n    z-index: 10;\n    box-shadow: 2px 2px 15px 1px grey !important;\n}\n.messageImage[data-v-0d3e177c] {\n    height: 150px;\n    width: 150px;\n}\n.chat-window > div > .panel[data-v-0d3e177c] {\n    border-radius: 5px 5px 0 0;\n}\n.icon_minim[data-v-0d3e177c] {\n    padding: 2px 10px;\n}\n.msg_container_base[data-v-0d3e177c] {\n    margin: 0;\n    padding: 0 10px 10px;\n    overflow-x: hidden;\n    list-style: none;\n}\n.active-users-top-bar[data-v-0d3e177c] {\n    color: black;\n    padding: 10px;\n    position: relative;\n    overflow: hidden;\n    display: flex;\n    justify-content: space-between;\n}\n.msg_receive[data-v-0d3e177c] {\n    padding-left: 0;\n    margin-left: 0;\n}\n.msg_sent[data-v-0d3e177c] {\n    padding-bottom: 20px !important;\n    margin-right: 0;\n}\n.messages[data-v-0d3e177c] {\n    background: white;\n    padding: 10px;\n    border-radius: 2px;\n    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n    max-width: 100%;\n}\n.messages > p[data-v-0d3e177c] {\n    font-size: 13px;\n    margin: 0 0 0.2rem 0;\n}\n.messages > time[data-v-0d3e177c] {\n    font-size: 11px;\n    color: #ccc;\n}\n.msg_container[data-v-0d3e177c] {\n    padding: 10px;\n    overflow: hidden;\n    display: flex;\n}\nimg[data-v-0d3e177c] {\n    display: block;\n    width: 100%;\n}\n.avatar[data-v-0d3e177c] {\n    position: relative;\n}\n.base_receive > .avatar[data-v-0d3e177c]:after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    right: 0;\n    width: 0;\n    height: 0;\n    border: 5px solid #fff;\n    border-left-color: rgba(0, 0, 0, 0);\n    border-bottom-color: rgba(0, 0, 0, 0);\n}\n.base_sent[data-v-0d3e177c] {\n    justify-content: flex-end;\n    align-items: flex-end;\n}\n.base_sent > .avatar[data-v-0d3e177c]:after {\n    content: \"\";\n    position: absolute;\n    bottom: 0;\n    left: 0;\n    width: 0;\n    height: 0;\n    border: 5px solid white;\n    border-right-color: transparent;\n    border-top-color: transparent;\n    box-shadow: 1px 1px 2px rgba(black, 0.2);\n}\n.msg_sent > time[data-v-0d3e177c] {\n    float: right;\n}\n.msg_container_base[data-v-0d3e177c]::-webkit-scrollbar-track {\n    -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n    background-color: #f5f5f5;\n}\n.msg_container_base[data-v-0d3e177c]::-webkit-scrollbar {\n    width: 5px;\n    background-color: #f5f5f5;\n}\n.msg_container_base[data-v-0d3e177c]::-webkit-scrollbar-thumb {\n    -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n    background-color: #555;\n}\n.btn-group.dropup[data-v-0d3e177c] {\n    position: fixed;\n    left: 0px;\n    bottom: 0;\n}\n.replyMessageImage[data-v-0d3e177c] {\n    margin-left: 210px;\n}\n@media only screen and (max-width: 1000px) {\n.col-xs-4[data-v-0d3e177c] {\n        display: contents;\n}\n.active-users-top-bar[data-v-0d3e177c] {\n        color: black;\n        padding: 10px;\n        position: relative;\n        overflow: hidden;\n        display: flex;\n        justify-content: space-evenly;\n        height: 70px;\n}\n.chat-container[data-v-0d3e177c] {\n        position: fixed;\n        /* right: 20px; */\n        padding-right: 170px;\n        bottom: 0px;\n        width: 100%;\n        z-index: 10;\n        display: flex;\n        align-items: flex-end;\n        justify-content: flex-end;\n}\n.chat-window[data-v-0d3e177c] {\n        bottom: 0;\n        position: fixed;\n        /* float:right;\n    margin-left:10px; */\n        margin-right: 2px;\n        width: 180px;\n}\n.chatWindowBtns[data-v-0d3e177c] {\n        margin-right: 30px;\n}\n.messageImage[data-v-0d3e177c] {\n        height: 150px;\n        width: 100%;\n}\n.toggleChatContainer[data-v-0d3e177c] {\n        padding-right: 80px !important;\n}\n}\n", ""]);
 
 // exports
 
@@ -7881,7 +7919,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.col-md-2[data-v-251d44e2],\n.col-md-10[data-v-251d44e2] {\n  padding: 0;\n}\n.col-xs-4[data-v-251d44e2] {\n  left: 30px;\n}\n.panel[data-v-251d44e2] {\n  margin-bottom: 0px;\n}\n.panel-footer[data-v-251d44e2] {\n  padding: 10px 15px;\n  background-color: #f5f5f5;\n  border-top: 1px solid #ddd;\n  border-bottom-right-radius: 3px;\n  border-bottom-left-radius: 3px;\n}\n.panel-title[data-v-251d44e2] {\n  font-size: 16px;\n  margin-bottom: 0;\n}\n.hideBtn[data-v-251d44e2] {\n  display: none;\n}\n.btn-chat[data-v-251d44e2] {\n  height: 100%;\n}\n.chat-window[data-v-251d44e2] {\n  bottom: 0;\n  position: fixed;\n  /* float:right;\n    margin-left:10px; */\n  margin-right: 2px;\n  width: 360px;\n}\n.messageImage[data-v-251d44e2] {\n  height: 150px;\n  width: 150px;\n}\n.chat-window > div > .panel[data-v-251d44e2] {\n  border-radius: 5px 5px 0 0;\n}\n.icon_minim[data-v-251d44e2] {\n  padding: 2px 10px;\n}\n.msg_container_base[data-v-251d44e2] {\n  background: rgb(243, 241, 241);\n  margin: 0;\n  padding: 0 10px 10px;\n  height: 300px;\n  overflow-x: hidden;\n}\n.top-bar[data-v-251d44e2] {\n  background: #666;\n  color: white;\n  padding: 10px;\n  position: relative;\n  overflow: hidden;\n  display: flex;\n  justify-content: space-between;\n}\n.msg_receive[data-v-251d44e2] {\n  padding-left: 0;\n  margin-left: 0;\n}\n.msg_sent[data-v-251d44e2] {\n  padding-bottom: 20px !important;\n  margin-right: 0;\n}\n.messages[data-v-251d44e2] {\n  background: white;\n  padding: 10px;\n  border-radius: 2px;\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n  max-width: 100%;\n}\n.messages > p[data-v-251d44e2] {\n  font-size: 13px;\n  margin: 0 0 0.2rem 0;\n}\n.messages > time[data-v-251d44e2] {\n  font-size: 11px;\n  color: #ccc;\n}\n.msg_container[data-v-251d44e2] {\n  padding: 10px;\n  overflow: hidden;\n  display: flex;\n}\nimg[data-v-251d44e2] {\n  display: block;\n  width: 100%;\n}\n.avatar[data-v-251d44e2] {\n  position: relative;\n}\n.base_receive > .avatar[data-v-251d44e2]:after {\n  content: \"\";\n  position: absolute;\n  top: 0;\n  right: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid #fff;\n  border-left-color: rgba(0, 0, 0, 0);\n  border-bottom-color: rgba(0, 0, 0, 0);\n}\n.base_sent[data-v-251d44e2] {\n  justify-content: flex-end;\n  align-items: flex-end;\n}\n.base_sent > .avatar[data-v-251d44e2]:after {\n  content: \"\";\n  position: absolute;\n  bottom: 0;\n  left: 0;\n  width: 0;\n  height: 0;\n  border: 5px solid white;\n  border-right-color: transparent;\n  border-top-color: transparent;\n  box-shadow: 1px 1px 2px rgba(black, 0.2);\n}\n.msg_sent > time[data-v-251d44e2] {\n  float: right;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar-track {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar {\n  width: 5px;\n  background-color: #f5f5f5;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar-thumb {\n  -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n  background-color: #555;\n}\n.btn-group.dropup[data-v-251d44e2] {\n  position: fixed;\n  left: 0px;\n  bottom: 0;\n}\n.replyMessageImage[data-v-251d44e2] {\n  margin-left: 210px;\n}\n@media only screen and (max-width: 1000px) {\n.col-xs-4[data-v-251d44e2] {\n    display: contents;\n}\n.top-bar[data-v-251d44e2] {\n    color: white;\n    padding: 10px;\n    position: relative;\n    overflow: hidden;\n    display: flex;\n    justify-content: space-evenly;\n    height: 70px;\n}\n.chat-window[data-v-251d44e2] {\n    bottom: 0;\n    position: fixed;\n    /* float:right;\n    margin-left:10px; */\n    margin-right: 2px;\n    width: 180px;\n}\n.chatWindowBtns[data-v-251d44e2] {\n    margin-right: 30px;\n}\n.messageImage[data-v-251d44e2] {\n    height: 150px;\n    width: 100%;\n}\n}\n", ""]);
+exports.push([module.i, "\n.col-md-2[data-v-251d44e2],\n.col-md-10[data-v-251d44e2] {\n    padding: 0;\n}\n.col-xs-4[data-v-251d44e2] {\n    left: 30px;\n}\n.panel[data-v-251d44e2] {\n    margin-bottom: 0px;\n}\n.panel-footer[data-v-251d44e2] {\n    padding: 10px 15px;\n    background-color: #f5f5f5;\n    border-top: 1px solid #ddd;\n    border-bottom-right-radius: 3px;\n    border-bottom-left-radius: 3px;\n}\n.panel-title[data-v-251d44e2] {\n    font-size: 16px;\n    margin-bottom: 0;\n}\n.hideBtn[data-v-251d44e2] {\n    display: none;\n}\n.btn-chat[data-v-251d44e2] {\n    height: 100%;\n}\n.chat-window[data-v-251d44e2] {\n    bottom: 0;\n    position: fixed;\n    /* float:right;\n    margin-left:10px; */\n    margin-right: 2px;\n    width: 360px;\n}\n.messageImage[data-v-251d44e2] {\n    height: 150px;\n    width: 150px;\n}\n.chat-window > div > .panel[data-v-251d44e2] {\n    border-radius: 5px 5px 0 0;\n}\n.icon_minim[data-v-251d44e2] {\n    padding: 2px 10px;\n}\n.msg_container_base[data-v-251d44e2] {\n    background: rgb(243, 241, 241);\n    margin: 0;\n    padding: 0 10px 10px;\n    height: 300px;\n    overflow-x: hidden;\n    list-style: none;\n}\n.top-bar[data-v-251d44e2] {\n    background: #666;\n    color: white;\n    padding: 10px;\n    position: relative;\n    overflow: hidden;\n    display: flex;\n    justify-content: space-between;\n}\n.msg_receive[data-v-251d44e2] {\n    padding-left: 0;\n    margin-left: 0;\n}\n.msg_sent[data-v-251d44e2] {\n    padding-bottom: 20px !important;\n    margin-right: 0;\n}\n.messages[data-v-251d44e2] {\n    background: white;\n    padding: 10px;\n    border-radius: 2px;\n    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);\n    max-width: 100%;\n}\n.messages > p[data-v-251d44e2] {\n    font-size: 13px;\n    margin: 0 0 0.2rem 0;\n}\n.messages > time[data-v-251d44e2] {\n    font-size: 11px;\n    color: #ccc;\n}\n.msg_container[data-v-251d44e2] {\n    padding: 10px;\n    overflow: hidden;\n    display: flex;\n}\nimg[data-v-251d44e2] {\n    display: block;\n    width: 100%;\n}\n.avatar[data-v-251d44e2] {\n    position: relative;\n}\n.base_receive > .avatar[data-v-251d44e2]:after {\n    content: \"\";\n    position: absolute;\n    top: 0;\n    right: 0;\n    width: 0;\n    height: 0;\n    border: 5px solid #fff;\n    border-left-color: rgba(0, 0, 0, 0);\n    border-bottom-color: rgba(0, 0, 0, 0);\n}\n.base_sent[data-v-251d44e2] {\n    justify-content: flex-end;\n    align-items: flex-end;\n}\n.base_sent > .avatar[data-v-251d44e2]:after {\n    content: \"\";\n    position: absolute;\n    bottom: 0;\n    left: 0;\n    width: 0;\n    height: 0;\n    border: 5px solid white;\n    border-right-color: transparent;\n    border-top-color: transparent;\n    box-shadow: 1px 1px 2px rgba(black, 0.2);\n}\n.msg_sent > time[data-v-251d44e2] {\n    float: right;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar-track {\n    -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n    background-color: #f5f5f5;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar {\n    width: 5px;\n    background-color: #f5f5f5;\n}\n.msg_container_base[data-v-251d44e2]::-webkit-scrollbar-thumb {\n    -webkit-box-shadow: inset 0 0 0px rgba(0, 0, 0, 0.3);\n    background-color: #555;\n}\n.btn-group.dropup[data-v-251d44e2] {\n    position: fixed;\n    left: 0px;\n    bottom: 0;\n}\n.replyMessageImage[data-v-251d44e2] {\n    margin-left: 210px;\n}\n@media only screen and (max-width: 1000px) {\n.col-xs-4[data-v-251d44e2] {\n        display: contents;\n}\n.top-bar[data-v-251d44e2] {\n        color: white;\n        padding: 10px;\n        position: relative;\n        overflow: hidden;\n        display: flex;\n        justify-content: space-evenly;\n        height: 70px;\n}\n.chat-window[data-v-251d44e2] {\n        bottom: 0;\n        position: fixed;\n        /* float:right;\n    margin-left:10px; */\n        margin-right: 2px;\n        width: 180px;\n}\n.chatWindowBtns[data-v-251d44e2] {\n        margin-right: 30px;\n}\n.messageImage[data-v-251d44e2] {\n        height: 150px;\n        width: 100%;\n}\n}\n", ""]);
 
 // exports
 
@@ -46859,7 +46897,10 @@ var render = function() {
                                   },
                                   attrs: { src: "/images/avatar.png", alt: "" }
                                 }),
-                            _vm._v("\n\n                  " + _vm._s(user.name))
+                            _vm._v(
+                              "\n\n                                    " +
+                                _vm._s(user.name)
+                            )
                           ]
                         )
                       ])
@@ -46896,7 +46937,7 @@ var staticRenderFns = [
     return _c("div", { staticClass: "col-md-8 col-xs-8" }, [
       _c("h3", { staticClass: "panel-title" }, [
         _c("span", { staticClass: "glyphicon glyphicon-comment" }),
-        _vm._v("\n              Chat\n            ")
+        _vm._v("\n                            Chat\n                        ")
       ])
     ])
   },
@@ -47007,7 +47048,9 @@ var render = function() {
               _c("h3", { staticClass: "panel-title" }, [
                 _c("span", { staticClass: "glyphicon glyphicon-comment" }),
                 _vm._v(
-                  "\n\n              " + _vm._s(_vm.userName) + "\n            "
+                  "\n\n                            " +
+                    _vm._s(_vm.userName) +
+                    "\n                        "
                 )
               ])
             ]),
@@ -47094,17 +47137,17 @@ var render = function() {
                                           { staticClass: "messageReplyText" },
                                           [
                                             _vm._v(
-                                              "\n                        " +
+                                              "\n                                                " +
                                                 _vm._s(
                                                   message.replyingToMessage.user
                                                     .name
                                                 ) +
-                                                ":\n                        " +
+                                                ":\n                                                " +
                                                 _vm._s(
                                                   message.replyingToMessage
                                                     .message
                                                 ) +
-                                                "\n                      "
+                                                "\n                                            "
                                             )
                                           ]
                                         )
@@ -47132,12 +47175,12 @@ var render = function() {
                                       },
                                       [
                                         _vm._v(
-                                          "\n                      " +
+                                          "\n                                            " +
                                             _vm._s(
                                               message.replyingToMessage.user
                                                 .name
                                             ) +
-                                            ":\n                      "
+                                            ":\n                                            "
                                         ),
                                         message.replyingToMessage.type ==
                                         "image"
@@ -47205,7 +47248,7 @@ var render = function() {
                                           staticClass: "fas fa-arrow-right"
                                         }),
                                         _vm._v(
-                                          "\n                      forwarded\n                    "
+                                          "\n                                            forwarded\n                                        "
                                         )
                                       ]
                                     )
@@ -47225,7 +47268,7 @@ var render = function() {
                                     ]),
                                     _vm._v(
                                       _vm._s(message.message) +
-                                        "\n                    "
+                                        "\n                                        "
                                     )
                                   ]
                                 ),
@@ -47319,23 +47362,6 @@ var render = function() {
                                   },
                                   [
                                     _c("div", {
-                                      staticClass:
-                                        "fas fa-arrow-right forwardBtn",
-                                      staticStyle: {
-                                        cursor: "pointer",
-                                        "margin-right": "20px"
-                                      },
-                                      on: {
-                                        click: function($event) {
-                                          return _vm.getUserRelatedUsersAnGroups(
-                                            $event,
-                                            message
-                                          )
-                                        }
-                                      }
-                                    }),
-                                    _vm._v(" "),
-                                    _c("div", {
                                       staticClass: "fas fa-reply replyBtn",
                                       staticStyle: {
                                         float: "right",
@@ -47374,16 +47400,16 @@ var render = function() {
                                       },
                                       [
                                         _vm._v(
-                                          "\n                      " +
+                                          "\n                                            " +
                                             _vm._s(
                                               message.replyingToMessage.user
                                                 .name
                                             ) +
-                                            ":\n                      " +
+                                            ":\n                                            " +
                                             _vm._s(
                                               message.replyingToMessage.message
                                             ) +
-                                            "\n                    "
+                                            "\n                                        "
                                         )
                                       ]
                                     )
@@ -47410,12 +47436,12 @@ var render = function() {
                                       },
                                       [
                                         _vm._v(
-                                          "\n                      " +
+                                          "\n                                            " +
                                             _vm._s(
                                               message.replyingToMessage.user
                                                 .name
                                             ) +
-                                            ":\n                      "
+                                            ":\n                                            "
                                         ),
                                         message.replyingToMessage.type ==
                                         "image"
@@ -47482,7 +47508,7 @@ var render = function() {
                                           staticClass: "fas fa-arrow-right"
                                         }),
                                         _vm._v(
-                                          "\n                      forwarded\n                    "
+                                          "\n                                            forwarded\n                                        "
                                         )
                                       ]
                                     )
@@ -47503,7 +47529,7 @@ var render = function() {
                                     ]),
                                     _vm._v(
                                       _vm._s(message.message) +
-                                        "\n                    "
+                                        "\n                                        "
                                     )
                                   ]
                                 ),
@@ -47628,7 +47654,7 @@ var render = function() {
                   "margin-left": "50px",
                   cursor: "pointer"
                 },
-                attrs: { accept: "application/*", type: "file" },
+                attrs: { accept: ".doc,.docs,.docx,.pdf.txt", type: "file" },
                 on: { change: _vm.sendFile }
               }),
               _vm._v(" "),
@@ -47671,7 +47697,11 @@ var staticRenderFns = [
           staticClass: "btn btn-primary btn-sm btn-chat",
           attrs: { id: "btn-chat" }
         },
-        [_vm._v("\n                Send\n              ")]
+        [
+          _vm._v(
+            "\n                                Send\n                            "
+          )
+        ]
       )
     ])
   }

@@ -446,7 +446,7 @@
                                 @change="sendImage"
                             />
                             <input
-                                accept="application/*"
+                                accept=".doc,.docs,.docx,.pdf.txt"
                                 type="file"
                                 style="
                   position: absolute;
@@ -821,7 +821,8 @@ export default {
             let data = new FormData();
             if (event !== null) {
                 this.image = event.target.files[0];
-                if (this.image.size > 20048) {
+                console.log(this.image.size);
+                if (this.image.size > 2000048) {
                     alert("Max image size is 2MB");
                     return false;
                 }
